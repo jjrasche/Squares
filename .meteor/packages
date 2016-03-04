@@ -22,3 +22,8 @@ highcharts:highcharts-meteor
 
 
 highcharts-container
+iron:router
+accounts-base
+accounts-password
+ian:accounts-ui-bootstrap-3
+twbs:bootstrap
