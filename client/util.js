@@ -23,12 +23,14 @@ formatBoardData = function formatBoardData(boardData) {
 	var boardArray = []
 	for (var i = 0; i < 10; i++) {
 		for (var j = 0; j < 10; j++) {
-			var key = getSquareKey(i,j);
+			// var key = getSquareKey(i,j); 
+			var value = formatCellData(boardData[getSquareKey(i,j)])
+			var color = boardData[getSquareKey(i,j)] == Meteor.userId() ? 'yellow' : 'green';
 			//console.log(key, boardData[key]);
-			boardArray.push([i,j,formatCellData(boardData[key])]);
+			boardArray.push({x: i,y: j,value: value, color: color});
 		}
 	}
-	// console.log(JSON.stringify(boardArray));
+	console.log(JSON.stringify(boardArray));
 	return boardArray;
 }
 

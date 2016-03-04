@@ -64,6 +64,12 @@ Template.grid.helpers({
                   return "<b><u>Games Hit:</u></b><br>"// + gameData[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
               }
           },
+          colorAxis: {
+              stops: [
+                  [0, '#3060cf'],
+                  [0.5, '#fffbbc'],
+                  [0.9, '#c4463a']]
+          },
           series: [{
               name: '',
               title: '',
@@ -72,18 +78,18 @@ Template.grid.helpers({
               data: formatBoardData(boardData),
               dataLabels: {
                 formatter: function () {
-                        var maxLength = 10;
-                        // console.log('point: ', this.point);
-                        // console.log('series: ', this.series);
-
+                        // shapeArgs = 30 -> 4 characters,  100 = 12   --> 8/70 ~ 1 char / 10 shapeArgs
+                        var size = this.point.shapeArgs.height;
+                        var charactersPerLine = (size < 30) ? 5 : 5 + Math.floor(size/10);
                         var text = this.point.value;
-                      formatted = text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+
+                        var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
                         //console.log("formatter: ", text, formatted);
                         console.log('size (' + this.x + ',' + this.y + '): ', this.point.shapeArgs.height, this.point.shapeArgs.width, formatted);
                         
                         Session.set('size', this.point.shapeArgs.height);
 
-                        return '<div class="js-ellipse" style="width:150px; overflow:hidden" title="' + text + '">' + formatted + '</div>';
+                        return '<div class="js-ellipse" style="width:150px; overflow:hidden" title="' + text + '">' + formatted  + '</div>';
                 },
                 allowOverlap: false,
                 enabled: true,
