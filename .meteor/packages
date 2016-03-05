@@ -27,3 +27,10 @@ accounts-base
 accounts-password
 ian:accounts-ui-bootstrap-3
 twbs:bootstrap
+peppelg:bootstrap-3-modal
+yogiben:autoform-modals
+email
+aldeed:collection2
+random
+aldeed:autoform
+meteorhacks:ssr

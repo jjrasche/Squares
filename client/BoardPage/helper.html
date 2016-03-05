@@ -1,6 +1,58 @@
 <!-- template html to be used in the layout.html file-->
 
 <template name="grid">
-	<div>{{squareSize}}</div>
+	{{#if inEditMode}}
+		{{> invitePlayers}}
+		{{> reAssignSquares}}
+	{{/if}}
+
+	{{selectedSquares}}
+	{{> editCheckBox}}
+	{{squareSize}}
 	<div id="chart" style="width: 80vw; height: 80vw;">{{createChart this}}</div>
+</template>
+
+
+<template name="editCheckBox">
+	Edit Mode<input type="checkbox"  id="editCheckBox">
+</template>
+
+<template name="invitePlayers">	
+	{{> autoformModals}}
+	{{#afModal class="btn btn-primary" formId="invitationForm" collection="Invitation" operation="insert" fields="email,userName"}}
+	  Create Invitation
+	{{/afModal}}
+</template>
+
+<template name="reAssignSquares">	
+	{{> autoformModals}}
+	{{#afModal class="btn btn-primary" formId="reAssignSquaresForm" collection="ReAssignment" operation="insert"}}
+	  Re-Assign Squares
+	{{/afModal}}
+</template>
+
+
+
+<template name="assignSquaresModal">
+
+<!--     <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Assign Squares To</h4>
+                </div>
+                <form>
+                	<input id="boardPageModalAssignEmail" type="text" placeholder="email">
+                	<br>
+                	<input id="boardPageModalAssignUserName" type="text" placeholder="user name">
+                </form>
+                <div class="modal-footer">
+                    <button id="assignSquaresModalButton" type="button" class="btn btn-default" data-dismiss="modal">Assign</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div> -->
 </template>

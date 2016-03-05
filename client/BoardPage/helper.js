@@ -12,14 +12,47 @@
 */
 
 
+Session.set('boardPageselectedSquares', []);
+Session.set('boardPageEditMode', true);
+
+Template.editCheckBox.events({
+  'click #editCheckBox' : function(event){
+    //event.preventDefault();
+    var val = document.querySelector('#editCheckBox:checked');
+    console.log("editCheckBox.events(: ", val);
+    if (val) Session.set('boardPageEditMode', true);
+    else {
+      Session.set('boardPageEditMode', false);
+      Session.set('boardPageselectedSquares', []);
+    }
+    console.log(Session.get('boardPageEditMode'));
+  }
+})
+
+// Template.assignSquares.events({
+//   'click #assignSelectedSquares' : function(event){
+//     //event.preventDefault();
+//     Modal.show('assignSquaresModal');
+
+//   }
+// })
+
+
 Template.grid.helpers({
   squareSize: function () {
-    return Session.get('size');
+    return JSON.stringify(Session.get('size'));
+  },
+  selectedSquares: function () {
+    return JSON.stringify(Session.get('boardPageselectedSquares'));
+  },
+  inEditMode: function () {
+    return Session.get('boardPageEditMode');
   },
   createChart: function (boardData) {
-  	console.log('context: ', boardData);
+  	// console.log('context: ', boardData);
     var winnerNumbers = boardData.winnerNumbers == null ? ['','','','','','','','','',''] : boardData.winnerNumbers;
     var loserNumbers = boardData.loserNumbers == null ? ['','','','','','','','','',''] : boardData.loserNumbers;
+    var selectedSquares = Session.get('boardPageselectedSquares');
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
@@ -42,17 +75,30 @@ Template.grid.helpers({
               series: {
                   events: {
                       click: function(e) {
-                        var x = e.point.x;
-                        var y = e.point.y;
-                        // alert(x + ":" + y);
-                        Meteor.call('modifyBoard', boardData._id, x, y, function(err, res) {
-                          if (err) {
-                            alert(err);
-                          }
-                          if (!err) {
+                        var x = e.point.x; var y = e.point.y;
 
+                        // if in edit mode, change color of selected squares save in session
+                        console.log('in edit mode:', Session.get('boardPageEditMode'));
+                        if (Session.get('boardPageEditMode')) {
+                          if (squareSelected(x, y)) {
+                            selectedSquares = selectedSquares.filter(function(ele) {
+                                return !(ele.x == x && ele.y == y)
+                            });
+                          } else {
+                            selectedSquares.push({x: x, y: y});
                           }
-                        });
+                          Session.set('boardPageselectedSquares', selectedSquares);
+                        } 
+                        else {
+                          Meteor.call('modifyBoard', boardData._id, [{x,y}], function(err, res) {
+                            if (err) {
+                              alert(err);
+                            }
+                            if (!err) {
+
+                            }
+                          });
+                        }
                       }
                   }
               }
@@ -78,18 +124,20 @@ Template.grid.helpers({
               data: formatBoardData(boardData),
               dataLabels: {
                 formatter: function () {
-                        // shapeArgs = 30 -> 4 characters,  100 = 12   --> 8/70 ~ 1 char / 10 shapeArgs
+                      // only do this once per board to be uniform
+                      if (this.point.x==0 && this.point.y==0) {
                         var size = this.point.shapeArgs.height;
-                        var charactersPerLine = (size < 30) ? 5 : 5 + Math.floor(size/10);
-                        var text = this.point.value;
-
-                        var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
-                        //console.log("formatter: ", text, formatted);
-                        console.log('size (' + this.x + ',' + this.y + '): ', this.point.shapeArgs.height, this.point.shapeArgs.width, formatted);
-                        
-                        Session.set('size', this.point.shapeArgs.height);
-
-                        return '<div class="js-ellipse" style="width:150px; overflow:hidden" title="' + text + '">' + formatted  + '</div>';
+                        // console.log(this);
+                        var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
+                        Session.set('boardPageCharactersPerLine', charactersPerLine);
+                        Session.set('size', {chars:  charactersPerLine, size: size});
+                        // console.log('charperline: ', charactersPerLine);
+                      }
+                      var charactersPerLine = Session.get('boardPageCharactersPerLine');
+                      var text = this.point.value;
+                      var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
+                      // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
+                      return '<div class="js-ellipse" style="width:150px; overflow:hidden" title="' + text + '">' + formatted  + '</div>';
                 },
                 allowOverlap: false,
                 enabled: true,
