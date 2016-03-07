@@ -1,14 +1,15 @@
 <!-- template html to be used in the layout.html file-->
 
 <template name="grid">
-	{{#if inEditMode}}
-		{{> invitePlayers}}
-		{{> reAssignSquares}}
+	{{#if boardOwner}}
+		{{#if inEditMode}}
+			{{> invitePlayersModal}}
+			{{> assignSquaresModal}}
+		{{/if}}
+		{{selectedSquares}}
+		{{> editCheckBox}}
+		{{squareSize}}
 	{{/if}}
-
-	{{selectedSquares}}
-	{{> editCheckBox}}
-	{{squareSize}}
 	<div id="chart" style="width: 80vw; height: 80vw;">{{createChart this}}</div>
 </template>
 
@@ -17,42 +18,75 @@
 	Edit Mode<input type="checkbox"  id="editCheckBox">
 </template>
 
-<template name="invitePlayers">	
-	{{> autoformModals}}
-	{{#afModal class="btn btn-primary" formId="invitationForm" collection="Invitation" operation="insert" fields="email,userName"}}
-	  Create Invitation
-	{{/afModal}}
+
+
+
+<template name="invitePlayersModal">
+	<button class="btn btn-primary" id="invitePlayersButton">Invite</button>
+
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Invite Player and Assign Selected Squares</h4>
+                </div>
+
+                <div class="modal-body">
+	                <form title="hello buddy" id="invitePlayerForm">
+	                	<div class="form-group">
+ 	                		<label class="control-label" for="emailInvitePlayerModal">Email</label>
+ 	                		<input type="text" id="emailInvitePlayerModal" name="email">
+
+ 	                		<label class="control-label" for="userNameInvitePlayerModal">User Name</label>
+ 	                		<input type="text" id="userNameInvitePlayerModal" name="userName">
+	                	</div>
+	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
+	                </form>
+	            </div>
+                <div class="modal-footer"></div>
+            </div>
+        </div>
+    </div>
 </template>
 
-<template name="reAssignSquares">	
-	{{> autoformModals}}
-	{{#afModal class="btn btn-primary" formId="reAssignSquaresForm" collection="ReAssignment" operation="insert"}}
-	  Re-Assign Squares
-	{{/afModal}}
+
+
+
+<template name="boardMemeberSelector">
+	<select id="category-select" name="members">
+	    <option disabled="disabled" selected="selected">Please Select</option> 
+	    {{#each boardMembers}}
+	        <option value="{{this.profile.userName}}" data-id={{this._id}}>{{this.profile.userName}}</option>
+	    {{/each}}
+	</select>
 </template>
-
-
 
 <template name="assignSquaresModal">
+	<button class="btn btn-primary" id="assignSelectedSquares">assign</button>
 
-<!--     <div class="modal fade">
+    <div class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h4 class="modal-title">Assign Squares To</h4>
                 </div>
-                <form>
-                	<input id="boardPageModalAssignEmail" type="text" placeholder="email">
-                	<br>
-                	<input id="boardPageModalAssignUserName" type="text" placeholder="user name">
-                </form>
+
+                <div class="modal-body">
+	                <form title="hello buddy" id="assignSquareForm">
+	                	<div class="form-group">
+ 	                		<label class="control-label" for="members">Pick invited user to assign squares to</label>
+	                		{{> boardMemeberSelector}}
+	                	</div>
+	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
+	                </form>
+	            </div>
+
                 <div class="modal-footer">
-                    <button id="assignSquaresModalButton" type="button" class="btn btn-default" data-dismiss="modal">Assign</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
 
             </div>
         </div>
-    </div> -->
+    </div>
 </template>

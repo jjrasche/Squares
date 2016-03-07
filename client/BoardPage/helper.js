@@ -13,7 +13,7 @@
 
 
 Session.set('boardPageselectedSquares', []);
-Session.set('boardPageEditMode', true);
+Session.set('boardPageEditMode', false);
 
 Template.editCheckBox.events({
   'click #editCheckBox' : function(event){
@@ -29,7 +29,7 @@ Template.editCheckBox.events({
   }
 })
 
-// Template.assignSquares.events({
+// Template.assignSquaresModal.events({
 //   'click #assignSelectedSquares' : function(event){
 //     //event.preventDefault();
 //     Modal.show('assignSquaresModal');
@@ -39,6 +39,9 @@ Template.editCheckBox.events({
 
 
 Template.grid.helpers({
+  boardOwner: function() {
+    return Meteor.user()._id == this.owner;
+  },
   squareSize: function () {
     return JSON.stringify(Session.get('size'));
   },
@@ -48,10 +51,10 @@ Template.grid.helpers({
   inEditMode: function () {
     return Session.get('boardPageEditMode');
   },
-  createChart: function (boardData) {
-  	// console.log('context: ', boardData);
-    var winnerNumbers = boardData.winnerNumbers == null ? ['','','','','','','','','',''] : boardData.winnerNumbers;
-    var loserNumbers = boardData.loserNumbers == null ? ['','','','','','','','','',''] : boardData.loserNumbers;
+  createChart: function () {
+  	// console.log('context: ', this);
+    var winnerNumbers = this.winnerNumbers == null ? ['','','','','','','','','',''] : this.winnerNumbers;
+    var loserNumbers = this.loserNumbers == null ? ['','','','','','','','','',''] : this.loserNumbers;
     var selectedSquares = Session.get('boardPageselectedSquares');
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
@@ -78,7 +81,6 @@ Template.grid.helpers({
                         var x = e.point.x; var y = e.point.y;
 
                         // if in edit mode, change color of selected squares save in session
-                        console.log('in edit mode:', Session.get('boardPageEditMode'));
                         if (Session.get('boardPageEditMode')) {
                           if (squareSelected(x, y)) {
                             selectedSquares = selectedSquares.filter(function(ele) {
@@ -90,14 +92,12 @@ Template.grid.helpers({
                           Session.set('boardPageselectedSquares', selectedSquares);
                         } 
                         else {
-                          Meteor.call('modifyBoard', boardData._id, [{x,y}], function(err, res) {
-                            if (err) {
-                              alert(err);
-                            }
-                            if (!err) {
-
-                            }
-                          });
+                          try {
+                            Meteor.call('modifyBoard', this._id, Meteor.userId(), [{x,y}], function(err, res) {
+                              if (err) 
+                                handleServerError(err);
+                            });
+                          } catch(e){}
                         }
                       }
                   }
@@ -121,7 +121,7 @@ Template.grid.helpers({
               title: '',
               borderWidth: 3,
               backgroundColor: '#303030',
-              data: formatBoardData(boardData),
+              data: formatBoardData(),
               dataLabels: {
                 formatter: function () {
                       // only do this once per board to be uniform
@@ -164,9 +164,91 @@ Template.grid.helpers({
   }
 })
 
-Template.grid.events({
-  'click button': function () {
-    // increment the counter when button is clicked
-    Session.set('counter', Session.get('counter') + 1);
+Template.invitePlayersModal.events({
+  'click #invitePlayersButton' : function(event){
+    //event.preventDefault();
+    console.log("click #invitePlayersButton: ", this);
+    Modal.show('invitePlayersModal', this);
+  },
+  'submit #invitePlayerForm' : function(event) {
+    event.preventDefault();
+    var squares = Session.get('boardPageselectedSquares');
+    var email = event.target.email.value;
+    var userName = event.target.userName.value;
+    var board = getBoard();
+    var boardID = board._id;
+    var userID;
+    console.log("submit #invitePlayerForm  this: ", this);
+
+    // if email address is attached to user and user already a member, error
+    var existingUser = Meteor.users.findOne({emails: {$in: [email]}});
+    if (existingUser && userIsMemberOfBoard(board, existingUser))
+      throw new Meteor.Error("User already on board, try re-assigning squares");
+
+    // create user if doesn't exist
+    if (!existingUser) {
+      console.log("inserting new user");
+      Meteor.call('createUserAndInvitation', boardID, email, userName, squares, 
+        function(err, res) {
+          console.log("createUser callback: ", err, res);
+            if (err)
+              handleServerError(err);
+            userID = res
+      })
+    }
+    else {
+      console.log("found existing user: ", existingUser);
+      userID = existingUser._id;
+      Meteor.call('sendInvitation', boardID, userID, squares, 
+        function(err, res) {
+          if (err)
+            handleServerError(err);
+      });
+    }
+
+    Modal.hide('invitePlayersModal');
   }
 });
+
+
+
+Template.assignSquaresModal.events({
+  'click #assignSelectedSquares' : function(event){
+    //event.preventDefault();
+    console.log("click #assignSelectedSquares: ", this);
+    Modal.show('assignSquaresModal', this);
+  },
+  'submit #assignSquareForm' : function(event) {
+    event.preventDefault();
+    var squares = Session.get('boardPageselectedSquares');
+    var userID = $(event.target.members).find(':selected').data("id");
+
+    try {
+      Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
+        if (err)
+          handleServerError(err);
+      });
+    } catch (e) {}
+    Session.set('boardPageselectedSquares', []);
+    Modal.hide('assignSquaresModal');
+  }
+});
+
+
+Template.boardMemeberSelector.helpers({
+  boardMembers : function() {
+    return getBoardMemberUsers(this);
+  }
+})
+
+
+Template.registerHelper("printThis", function(templateName) {
+  // console.log(templateName, this);
+})
+
+
+handleServerError = function handleServerError(err) {
+  console.log(err);
+  alert(err);
+}
+
