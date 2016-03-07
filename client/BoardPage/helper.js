@@ -49,12 +49,13 @@ Template.grid.helpers({
     return JSON.stringify(Session.get('boardPageselectedSquares'));
   },
   inEditMode: function () {
-    return Session.get('boardPageEditMode');
+    return Session.get('boardPageEditMode') && 
+            Session.get('boardPageselectedSquares').length > 0;
   },
   createChart: function () {
-  	// console.log('context: ', this);
-    var winnerNumbers = this.winnerNumbers == null ? ['','','','','','','','','',''] : this.winnerNumbers;
-    var loserNumbers = this.loserNumbers == null ? ['','','','','','','','','',''] : this.loserNumbers;
+    var board = this;
+    var winnerNumbers = board.winnerNumbers == null ? ['','','','','','','','','',''] : board.winnerNumbers;
+    var loserNumbers = board.loserNumbers == null ? ['','','','','','','','','',''] : board.loserNumbers;
     var selectedSquares = Session.get('boardPageselectedSquares');
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
@@ -92,12 +93,11 @@ Template.grid.helpers({
                           Session.set('boardPageselectedSquares', selectedSquares);
                         } 
                         else {
-                          try {
-                            Meteor.call('modifyBoard', this._id, Meteor.userId(), [{x,y}], function(err, res) {
-                              if (err) 
-                                handleServerError(err);
-                            });
-                          } catch(e){}
+                          console.log("event: ", board);
+                          Meteor.call('modifyBoard', board._id, Meteor.userId(), [{x,y}], function(err, res) {
+                            if (err) 
+                              handleServerError(err);
+                          });
                         }
                       }
                   }
@@ -178,7 +178,7 @@ Template.invitePlayersModal.events({
     var board = getBoard();
     var boardID = board._id;
     var userID;
-    console.log("submit #invitePlayerForm  this: ", this);
+    console.log("submit #invitePlayerForm  this: ", this, userName, email);
 
     // if email address is attached to user and user already a member, error
     var existingUser = Meteor.users.findOne({emails: {$in: [email]}});
@@ -187,7 +187,7 @@ Template.invitePlayersModal.events({
 
     // create user if doesn't exist
     if (!existingUser) {
-      console.log("inserting new user");
+      console.log("inserting new user",  boardID, email, userName, squares);
       Meteor.call('createUserAndInvitation', boardID, email, userName, squares, 
         function(err, res) {
           console.log("createUser callback: ", err, res);
