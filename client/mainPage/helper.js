@@ -24,10 +24,11 @@ Template.createBoardModal.events({
   'click #createBoardButton' : function(event){
     event.preventDefault();
     console.log("click #createBoardButton: ", this);
-    Modal.show('createBoardModal', this);
+    Modal.show('createBoardModal');
   },
   'submit #createBoardForm' : function(event) {
     event.preventDefault();
+    console.log("submit #createBoardForm: ");
     var boardName = event.target.boardName.value;
 	Meteor.call('createBoard', boardName, function(err, res) {
 		if (err) handleServerError(err);
@@ -40,3 +41,10 @@ Template.createBoardModal.events({
 var boardUrl = function boardUrl(boardID) {
 	Router.go("/board/" + boardID)
 }
+
+Template.registerHelper("loggedIn", function() {
+	return Meteor.userId();
+});
+Template.registerHelper("notLoggedIn", function() {
+	return !Meteor.userId();
+});

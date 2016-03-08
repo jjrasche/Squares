@@ -1,16 +1,16 @@
 <!-- template html to be used in the layout.html file-->
 
 <template name="grid">
-	{{#if boardOwner}}
-		{{#if inEditMode}}
+	<div id="chart" style="width: 80vw; height: 80vw;">
+		{{#if boardOwner}}
+			{{> editCheckBox}}
 			{{> invitePlayersModal}}
 			{{> assignSquaresModal}}
+	<!-- 		{{selectedSquares}}
+			{{squareSize}} -->
 		{{/if}}
-<!-- 		{{selectedSquares}}
-		{{squareSize}} -->
-		{{> editCheckBox}}
-	{{/if}}
-	<div id="chart" style="width: 80vw; height: 80vw;">{{createChart this}}</div>
+		{{createChart this}}
+	</div>
 </template>
 
 
@@ -18,11 +18,15 @@
 	Edit Mode<input type="checkbox"  id="editCheckBox">
 </template>
 
+<template name="BoardName">
+	{{this.name}}
+</template>
+
 
 
 
 <template name="invitePlayersModal">
-	<button class="btn btn-primary" id="invitePlayersButton">Invite</button>
+	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="invitePlayersButton">Invite</button>
 
     <div class="modal fade">
         <div class="modal-dialog">
@@ -63,7 +67,7 @@
 </template>
 
 <template name="assignSquaresModal">
-	<button class="btn btn-primary" id="assignSelectedSquares">assign</button>
+	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="assignSelectedSquares">assign</button>
 
     <div class="modal fade">
         <div class="modal-dialog">

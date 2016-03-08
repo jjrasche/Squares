@@ -1,9 +1,20 @@
+<template name="loggedOutMessage">
+	{{#if notLoggedIn}}
+	<center>
+		sign up / log in <br>
+		to create or see your boards.
+	</center>
+	{{/if}}
+</template>
+
 <template name="userBoardsList">
-	<ul clas="list-group">
-	{{#each boards}}
-		{{> userBoard}}
-	{{/each}}
-	</ul>
+	{{#if loggedIn}}
+		<ul clas="list-group">
+		{{#each boards}}
+			{{> userBoard}}
+		{{/each}}
+		</ul>
+	{{/if}}
 </template>
 
 <template name="userBoard">
@@ -13,30 +24,27 @@
 </template>
 
 
-
-
-
-
-
 <template name="createBoardModal">
-	<button class="btn btn-primary" id="createBoardButton">Create Board</button>
-    <div class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title"></h4>
-                </div>
-                <div class="modal-body">
-	                <form title="create board" id="createBoardForm">
-	                	<div class="form-group">
- 	                		<label class="control-label" for="boardNameCreateBoardModal">Board Name</label>
- 	                		<input type="text" id="boardNameCreateBoardModal" name="boardName">
-	                	</div>
-	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Create</button>
-	                </form>
+	{{#if loggedIn}}
+		<button class="btn btn-primary" id="createBoardButton">Create Board</button>
+	    <div class="modal fade">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title"></h4>
+	                </div>
+	                <div class="modal-body">
+		                <form title="create board" id="createBoardForm">
+		                	<div class="form-group">
+	 	                		<label class="control-label" for="boardNameCreateBoardModal">Board Name</label>
+	 	                		<input type="text" id="boardNameCreateBoardModal" name="boardName">
+		                	</div>
+		                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Create</button>
+		                </form>
+		            </div>
+	                <div class="modal-footer"></div>
 	            </div>
-                <div class="modal-footer"></div>
-            </div>
-        </div>
-    </div>
+	        </div>
+	    </div>
+	{{/if}}
 </template>

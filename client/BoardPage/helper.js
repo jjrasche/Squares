@@ -64,7 +64,7 @@ Template.grid.helpers({
           chart: { type: 'heatmap', 
               // Edit chart spacing
               spacingBottom: 15,
-              spacingTop: 10,
+              spacingTop: 0,
               spacingLeft: 10,
               spacingRight: 10,
 
@@ -73,8 +73,37 @@ Template.grid.helpers({
               // height: 1000//480
           },
           title: { text: '' },
-          xAxis: { categories: winnerNumbers, opposite: true, title: null },
-          yAxis: { categories: loserNumbers,  title: null },
+          xAxis: { //categories: winnerNumbers, 
+                   tickLength: 0,
+                   minorTickLength: 0,
+                   opposite: true, 
+                   title: {
+                      text: 'Winners',
+                      style: {
+                        fontWeight: "bold",
+                        fontSize: 30
+                      },
+                      // margin: 10,
+                      // offset: 2
+                   },
+                   labels: {
+                    padding: 0
+                   }
+                 },
+          yAxis: { //categories: loserNumbers,  
+                   tickLength: 0,
+                   minorTickLength: 0,
+                   title: {
+                      text: 'Losers',
+                      style: {
+                        fontWeight: "bold",
+                        fontSize: 30
+                      }
+                   },
+                   labels: {
+                    padding: 0
+                   }
+                 },
           plotOptions: {
               series: {
                   events: {
@@ -167,6 +196,7 @@ Template.grid.helpers({
 Template.invitePlayersModal.events({
   'click #invitePlayersButton' : function(event){
     //event.preventDefault();
+    if($('#invitePlayersButton').hasClass('disabled')) return;
     console.log("click #invitePlayersButton: ", this);
     Modal.show('invitePlayersModal', this);
   },
@@ -206,15 +236,16 @@ Template.invitePlayersModal.events({
       });
     }
 
+    Session.set('boardPageselectedSquares', []);
     Modal.hide('invitePlayersModal');
   }
 });
 
 
-
 Template.assignSquaresModal.events({
   'click #assignSelectedSquares' : function(event){
     //event.preventDefault();
+    if($('#assignSelectedSquares').hasClass('disabled')) return;
     console.log("click #assignSelectedSquares: ", this);
     Modal.show('assignSquaresModal', this);
   },
@@ -242,10 +273,17 @@ Template.boardMemeberSelector.helpers({
 })
 
 
-Template.registerHelper("printThis", function(templateName) {
-  // console.log(templateName, this);
-})
 
+
+Template.registerHelper('boardPageEditButtonDisabled', 
+  function(){
+    if (Session.get('boardPageEditMode') && 
+        Session.get('boardPageselectedSquares').length > 0)
+      return "";
+    else 
+      return "disabled";
+  }
+);
 
 handleServerError = function handleServerError(err) {
   console.log(err);
