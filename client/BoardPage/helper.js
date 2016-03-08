@@ -90,6 +90,7 @@ Template.grid.helpers({
                       // offset: 2
                    },
                    labels: {
+                    enabled: false,
                     padding: 0
                    }
                  },
@@ -104,6 +105,7 @@ Template.grid.helpers({
                       }
                    },
                    labels: {
+                    enabled: false,
                     padding: 0
                    }
                  },
