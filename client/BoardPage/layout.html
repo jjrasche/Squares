@@ -1,8 +1,20 @@
 <template name='boardPage'>
 	<div class="row">
-		<div class="col-xs-4 col-xs-offset-4">{{> BoardName}}</div>
+		<div class="col-xs-6">{{> editWidget}}</div>
+		<div class="col-xs-4">{{> BoardName}}</div>
 	</div>
 	<div class="row">
-		{{> grid}}
+<!-- 		<div class="col-xs-2" style="background-color: yellow">
+			<div class="row">
+				{{> gameList}}
+			</div>
+			<div class="row">
+			</div>
+		</div> -->
+
+		<div class="col-xs-12" style="background-color: grey">
+			{{> grid}}	
+		</div>
 	</div>
+
 </template>

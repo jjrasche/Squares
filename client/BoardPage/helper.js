@@ -37,10 +37,9 @@ Template.editCheckBox.events({
 //   }
 // })
 
-
-Template.grid.helpers({
+Template.editWidget.helpers({
   boardOwner: function() {
-    return Meteor.user()._id == this.owner;
+    return isOwner(getBoard(), Meteor.user());
   },
   squareSize: function () {
     return JSON.stringify(Session.get('size'));
@@ -51,7 +50,11 @@ Template.grid.helpers({
   inEditMode: function () {
     return Session.get('boardPageEditMode') && 
             Session.get('boardPageselectedSquares').length > 0;
-  },
+  }
+})
+
+
+Template.grid.helpers({
   createChart: function () {
     var board = this;
     var winnerNumbers = board.winnerNumbers == null ? ['','','','','','','','','',''] : board.winnerNumbers;
@@ -266,9 +269,59 @@ Template.assignSquaresModal.events({
 });
 
 
+Template.changeBoardOwnershipModal.events({
+  'click #changeBoardOwnershipButton' : function(event){
+    //event.preventDefault();
+    Modal.show('changeBoardOwnershipModal', this);
+  },
+  'submit #addBoardOwnerForm' : function(event) {
+    event.preventDefault();
+    var userID = $(event.target.members).find(':selected').data("id");
+
+    Meteor.call('addOwner', this._id, userID, function(err, res) {
+      if (err)
+        handleServerError(err);
+    });
+
+    Modal.hide('changeBoardOwnershipModal');
+  }
+});
+
+
 Template.boardMemeberSelector.helpers({
   boardMembers : function() {
     return getBoardMemberUsers(this);
+  }
+})
+
+
+var gameData = [{  gameType: "NCAA",
+    winnerScore: "78",
+    loserScore: "65",
+    loser: "Idaho",
+    winner: "Kentucky"
+},
+{  gameType: "NCAA",
+    winnerScore: "62",
+    loserScore: "60",
+    loser: "Michigan State",
+    winner: "Michigan"
+}]
+Template.gameList.helpers({
+  games : function() {
+    return gameData
+  }
+});
+
+
+
+
+Template.gameItem.helpers({
+  gameDisplay: function() {
+    var game = this;
+    var ret = this.winner + "(" + this.winnerScore + ")  " + this.loser + "(" + this.loserScore + ")";
+    console.log("gameDisplay: ", ret);
+    return ret;
   }
 })
 

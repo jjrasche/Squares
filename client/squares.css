@@ -1,1 +1,6 @@
 /* CSS declarations go here */
+
+.fill { 
+    min-height: 100%;
+    height: 100%;
+}

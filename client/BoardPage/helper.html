@@ -1,18 +1,36 @@
 <!-- template html to be used in the layout.html file-->
 
 <template name="grid">
-	<div id="chart" style="width: 80vw; height: 80vw;">
-		{{#if boardOwner}}
-			{{> editCheckBox}}
-			{{> invitePlayersModal}}
-			{{> assignSquaresModal}}
-	<!-- 		{{selectedSquares}}
-			{{squareSize}} -->
-		{{/if}}
+	<div id="chart" style="width: 100vw; height: 100vw;">
 		{{createChart this}}
 	</div>
 </template>
 
+<template name="editWidget">
+	{{#if boardOwner}}
+		{{> editCheckBox}} <br>
+		{{> invitePlayersModal}}
+		{{> assignSquaresModal}}
+		{{> changeBoardOwnershipModal}}
+<!-- 		{{selectedSquares}}
+		{{squareSize}} -->
+	{{/if}}
+</template>
+
+
+<template name="gameList">
+	<ul clas="list-group">
+	{{#each games}}
+		{{> gameItem}}
+	{{/each}}
+	</ul>
+</template>
+
+<template name="gameItem">
+	<li class="list-group-item">
+		{{gameDisplay}}
+	</li>
+</template>
 
 <template name="editCheckBox">
 	Edit Mode<input type="checkbox"  id="editCheckBox">
@@ -65,6 +83,35 @@
 	    {{/each}}
 	</select>
 </template>
+
+<template name="changeBoardOwnershipModal">
+	<button class="btn btn-primary" id="changeBoardOwnershipButton">add/remove owner</button>
+    <div class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title">Select and Add an Owner</h4>
+                </div>
+
+                <div class="modal-body">
+	                <form title="hello buddy" id="addBoardOwnerForm">
+	                	<div class="form-group">
+ 	                		<label class="control-label" for="members">Pick invited user to make owner</label>
+	                		{{> boardMemeberSelector}}
+	                	</div>
+	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
+	                </form>
+	            </div>
+
+                <div class="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</template>
+
 
 <template name="assignSquaresModal">
 	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="assignSelectedSquares">assign</button>
