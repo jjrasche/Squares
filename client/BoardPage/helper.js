@@ -5,10 +5,12 @@
 
 /*
     TODO:
-    - size labels within squares
-    - color squares 
-    - all selecting of multiple squares and assigning to an email 
-      - send an invitation email to that person 
+    X size labels within squares  
+    X color squares 
+    X all selecting of multiple squares and assigning to an email 
+      X send an invitation email to that person 
+    - create lock board functionality
+    - create layout 
 */
 
 
@@ -63,8 +65,10 @@ Template.grid.helpers({
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
-        Highcharts.chart('chart', {
-          chart: { type: 'heatmap', 
+        Highcharts.chart('chart1', {
+          chart: { 
+              // renderTo: 'chart1'
+              type: 'heatmap', 
               // Edit chart spacing
               spacingBottom: 15,
               spacingTop: 0,
