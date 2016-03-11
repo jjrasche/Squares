@@ -50,8 +50,8 @@ Template.editWidget.helpers({
     return JSON.stringify(Session.get('boardPageselectedSquares'));
   },
   inEditMode: function () {
-    return Session.get('boardPageEditMode') && 
-            Session.get('boardPageselectedSquares').length > 0;
+    return Session.get('boardPageEditMode')  
+           //&& Session.get('boardPageselectedSquares').length > 0;
   }
 })
 
@@ -336,9 +336,10 @@ Template.gameItem.helpers({
 
 Template.registerHelper('boardPageEditButtonDisabled', 
   function(){
-    if (Session.get('boardPageEditMode') && 
-        Session.get('boardPageselectedSquares').length > 0)
+    if (Session.get('boardPageEditMode') ) {
+        //&& Session.get('boardPageselectedSquares').length > 0)
       return "";
+    }
     else 
       return "disabled";
   }
