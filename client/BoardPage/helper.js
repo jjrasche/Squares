@@ -309,17 +309,14 @@ Template.gameList.helpers({
   }
 });
 
-
-
-Template.gameItem.helpers({
-  gameDisplay: function() {
-    var game = this;
-    var ret = this.winner + "(" + this.winnerScore + ")  " + this.loser + "(" + this.loserScore + ")";
-    console.log("gameDisplay: ", ret);
-    return ret;
+Template.memberList.helpers({
+  members : function() {
+    var memberIDs = this.members.map(function(m) {return m._id});
+    var members = Meteor.users.find({_id: {$in: memberIDs}})
+    console.log("members: ", memberIDs, members);
+    return members;
   }
-})
-
+});
 
 
 

@@ -6,7 +6,7 @@
 
 .scrollable{
 	max-height: 200px;
-    overflow-y:scroll; 
+  overflow-y:scroll; 
 }
 
 /*.sameHeightRow{
@@ -17,8 +17,25 @@
 .sameHeightRow {
     overflow: hidden; 
 }
-
-[class*="col-"]{
-    margin-bottom: -99999px;
-    padding-bottom: 99999px;
+.sameHeightCol {
+    margin-bottom: -10000px;
+    padding-bottom: 10000px;
 }
+
+/*.row > [class*="col-"]{
+    margin-bottom: -10000px;
+    padding-bottom: 10000px;
+}*/
+
+/*.sameHeightRow {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+.row > [class='sameHeighCol'] {
+  display: flex;
+  flex-direction: column;
+}*/

@@ -10,6 +10,41 @@
 	</div>
 </template>
 
+
+<template name="gameList">
+	<ul class="list-group">
+	{{#each games}}
+		{{> gameItem}}
+	{{/each}}
+	</ul>
+</template>
+<template name="gameItem">
+	<li class="list-group-item">
+		{{this.homeScore}} {{this.homeTeam.name}} <br>
+		{{this.awayScore}} {{this.awayTeam.name}}
+	</li>
+</template>
+
+<template name="memberList">
+	<ul class="list-group">
+	{{#each members}}
+		{{> memberItem}}
+	{{/each}}
+	</ul>
+</template>
+<template name="memberItem">
+	<li class="list-group-item">
+		<div class="row sameHeightRow" style="background-color: grey"> 
+			<div class="col-xs-8 nopadding" style="background-color: orange">   {{this.profile.userName}}</div>
+			<div class="col-xs-1 nopadding" style="background-color: green">7</div>
+			<div class="col-xs-2 nopadding" style="background-color: yellow">1700</div>
+			<div class="col-xs-1 nopadding" style="background-color: red">Y</div>
+		</div>
+		<br><br><br><br><br><br><br><br>
+	</li>
+</template>
+
+
 <template name="editWidget">
 	{{#if boardOwner}}
 		{{> editCheckBox}} <br>
@@ -19,23 +54,6 @@
 <!-- 		{{selectedSquares}}
 		{{squareSize}} -->
 	{{/if}}
-</template>
-
-
-<template name="gameList">
-	<ul class="list-group">
-	{{#each games}}
-		{{> gameItem}}
-	{{/each}}
-	</ul>
-</template>
-
-<template name="gameItem">
-	{{printThis}}
-	<li class="list-group-item">
-		{{this.homeScore}} {{this.homeTeam.name}} <br>
-		{{this.awayScore}} {{this.awayTeam.name}}
-	</li>
 </template>
 
 <template name="editCheckBox">

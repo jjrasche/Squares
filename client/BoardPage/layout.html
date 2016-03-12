@@ -4,17 +4,16 @@
 		<div class="col-xs-4">{{> BoardName}}</div>
 	</div>
 	<div class="row sameHeightRow">
-		<div class="col-xs-2 nopadding" style="background-color: yellow">
-			lfjds
+		<div class="col-xs-2 nopadding sameHeightCol" style="background-color: yellow;">
+			{{> memberList}}
 		</div>
-		<div class="col-xs-6 nopadding" style="background-color: grey">
+		<div class="col-xs-8 nopadding" style="background-color: grey">
 			{{> grid}}
 		</div>
-		<div class="col-xs-4 nopadding scrollable" style="background-color: yellow">
+		<div class="col-xs-2 nopadding scrollable sameHeightCol" style="background-color: yellow">
 			{{> gameList}}
 		</div>
 	</div>
-
 <!-- 	{{> grid}}
  -->
 </template>
