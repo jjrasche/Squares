@@ -301,24 +301,13 @@ Template.boardMemeberSelector.helpers({
 })
 
 
-var gameData = [{  gameType: "NCAA",
-    winnerScore: "78",
-    loserScore: "65",
-    loser: "Idaho",
-    winner: "Kentucky"
-},
-{  gameType: "NCAA",
-    winnerScore: "62",
-    loserScore: "60",
-    loser: "Michigan State",
-    winner: "Michigan"
-}]
+
 Template.gameList.helpers({
   games : function() {
-    return gameData
+    var games = Game.find();
+    return games;
   }
 });
-
 
 
 
@@ -349,4 +338,9 @@ handleServerError = function handleServerError(err) {
   console.log(err);
   alert(err);
 }
+
+Template.registerHelper('printThis',
+  function() {
+    console.log(this);
+})
 
