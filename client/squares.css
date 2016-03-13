@@ -6,20 +6,16 @@
 
 .scrollable{
 	max-height: 200px;
-  overflow-y:scroll; 
+  overflow:auto; 
 }
-
-/*.sameHeightRow{
-	overflow: hidden;
-}*/
 
 
 .sameHeightRow {
     overflow: hidden; 
 }
 .sameHeightCol {
-    margin-bottom: -10000px;
-    padding-bottom: 10000px;
+    margin-bottom: -32767px;
+    padding-bottom: 32767px;
 }
 
 /*.row > [class*="col-"]{

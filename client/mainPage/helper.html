@@ -24,6 +24,14 @@
 </template>
 
 
+<template name="createBoardAutoformModal">
+	{{> autoformModals}}
+	{{#afModal class="btn btn-primary" collection="Board" meteorMethod="createBoard" operation="insert" fields="name,NCAATournament"}}
+	  Create Board
+	{{/afModal}}
+</template>
+
+
 <template name="createBoardModal">
 	{{#if loggedIn}}
 		<button class="btn btn-primary" id="createBoardButton">Create Board</button>
@@ -48,3 +56,4 @@
 	    </div>
 	{{/if}}
 </template>
+

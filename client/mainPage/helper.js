@@ -26,10 +26,16 @@ Template.createBoardModal.events({
     console.log("click #createBoardButton: ", this);
     Modal.show('createBoardModal');
   },
+  'change #category-select' : function(event) {
+  	event.preventDefault();
+  	// can't get the selection to trigger adding more fields
+  	console.log("change select: ", $(event.target.boardType).find(':selected').data("id"))
+  },
   'submit #createBoardForm' : function(event) {
     event.preventDefault();
-    console.log("submit #createBoardForm: ");
     var boardName = event.target.boardName.value;
+    var boardType = $(event.target.boardType).find(':selected').data("id");
+
 	Meteor.call('createBoard', boardName, function(err, res) {
 		if (err) handleServerError(err);
 		Router.go("/board/"+res);
@@ -37,6 +43,7 @@ Template.createBoardModal.events({
     Modal.hide('createBoardModal');
   }
 });
+
 
 var boardUrl = function boardUrl(boardID) {
 	Router.go("/board/" + boardID)

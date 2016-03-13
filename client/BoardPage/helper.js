@@ -315,8 +315,41 @@ Template.memberList.helpers({
     var members = Meteor.users.find({_id: {$in: memberIDs}})
     console.log("members: ", memberIDs, members);
     return members;
+  },
+  header : function() {
+    return {
+      name: "member",
+      numSquares: "#",
+      winnings: "$",
+      paid: "paid"
+    }
   }
 });
+Template.memberItem.helpers({
+  name: function() {
+    if (typeof(this) == "String") return "member";
+    var member = Meteor.users.find(this._id);
+    return member.profile.userName;
+  },
+  numSquares: function() {
+    if (typeof(this) == "String") return "#";
+    var member = Meteor.users.find(this._id);
+    var board = Board.findOne(this._id);
+    return getUserTotalNumSquares(board, member);    
+  },
+  winnings: function() {
+    if (typeof(this) == "String") return "$";
+    var member = Meteor.users.find(this._id);
+    var board = Board.findOne(this._id);
+    var games = Games.find({gameType: board.gameType}).fetch()
+    return getUserWinnings(board, games, member);   
+  },
+  paid: function() {
+    if (typeof(this) == "String") return "paid";
+    var member = Meteor.users.find(this._id);
+    return getUserPaid(this, member)
+  },
+})
 
 
 
