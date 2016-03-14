@@ -16,6 +16,8 @@
     X display games on board 
     - test updating board data
     - be able to select a game from gameList or member from memberlist and highlight all effected squares
+    - enable/test realtime game updates
+    - enforce square numbers
 */
 
 
@@ -121,7 +123,8 @@ Template.grid.helpers({
               series: {
                   events: {
                       click: function(e) {
-                        var x = e.point.x; var y = e.point.y;
+                        var x = this.series.xAxis.categories[e.point.x]; 
+                        var y = this.series.yAxis.categories[e.point.y];
 
                         // if in edit mode, change color of selected squares save in session
                         if (Session.get('boardPageEditMode')) {
@@ -149,7 +152,8 @@ Template.grid.helpers({
               formatter: function () {
                 var x = this.point.x;
                 var y = this.point.y;
-                // console.log(gameMatrix, x, y);
+                var realx = this;
+                console.log(x, y, this.series.yAxis.categories[this.point.y]);
                 var games = gameMatrix[x][y];
                 var ret = "<b><u>Games Hit:</u></b><br>";
                 for (var i = 0; i < games.length; i++) {
