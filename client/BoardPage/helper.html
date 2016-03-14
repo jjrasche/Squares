@@ -19,11 +19,12 @@
 	</ul>
 </template>
 <template name="gameItem">
-	<li class="list-group-item">
+	<li class="list-group-item gameItems" name="gameItem" data-id={{this._id}} style="background-color: {{backgroundColor}}">
 		{{this.homeScore}} {{this.homeTeam.name}} <br>
 		{{this.awayScore}} {{this.awayTeam.name}}
 	</li>
 </template>
+
 
 <template name="memberList">
 	<ul class="list-group">
@@ -36,21 +37,20 @@
 	</ul>
 </template>
 <template name="memberItem">
-	{{printThis}}
-	<li class="list-group-item">
-		<div class="row" style="background-color: grey"> 
-			<div class="col-xs-7" style="background-color: orange">{{name}}</div>
-			<div class="col-xs-1 nopadding" style="text-align: center;background-color: green">{{numSquares}}</div>
-			<div class="col-xs-2 nopadding" style="text-align: center;background-color: yellow">{{winnings}}</div>
-			<div class="col-xs-2 nopadding" style="text-align: center;background-color: red">{{paid}}</div>
+	<li class="list-group-item nopadding">
+		<div class="row nopadding" style="background-color: grey"> 
+			<div class="col-xs-7 " style="background-color: orange">{{name }}</div>
+			<div class="col-xs-1 nopadding" style="text-align: center;background-color: green">{{numSquares ..}}</div>
+			<div class="col-xs-2 nopadding" style="text-align: center;background-color: yellow">{{winnings ..}}</div>
+			<div class="col-xs-2 nopadding" style="text-align: center;background-color: red">{{paid ..}}</div>
 		</div>
-<!-- 		<br><br><br><br><br><br><br><br>
- -->	</li>
+	</li>
 </template>
 
 
 <template name="editWidget">
 	{{#if boardOwner}}
+		{{> lockBoardButton}}
 		{{> editCheckBox}} <br>
 		{{> invitePlayersModal}}
 		{{> assignSquaresModal}}
@@ -69,6 +69,9 @@
 </template>
 
 
+<template name="lockBoardButton">
+	<button class="btn btn-warning" id="lockBoardButton">Lock Board</button>
+</template>
 
 
 <template name="invitePlayersModal">

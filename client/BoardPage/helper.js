@@ -9,12 +9,19 @@
     X color squares 
     X all selecting of multiple squares and assigning to an email 
       X send an invitation email to that person 
-    - create lock board functionality
-    - create layout 
+    X create lock board functionality
+      X assing random numbers to column on locking
+    X create layout 
+    - sort member columns
+    X display games on board 
+    - test updating board data
+    - be able to select a game from gameList or member from memberlist and highlight all effected squares
 */
 
 
 Session.set('boardPageselectedSquares', []);
+Session.set('boardPageselectedGames', []);
+Session.set('boardPageselectedMembers', []);
 Session.set('boardPageEditMode', false);
 
 Template.editCheckBox.events({
@@ -61,7 +68,12 @@ Template.grid.helpers({
     var board = this;
     var winnerNumbers = board.winnerNumbers == null ? ['','','','','','','','','',''] : board.winnerNumbers;
     var loserNumbers = board.loserNumbers == null ? ['','','','','','','','','',''] : board.loserNumbers;
+
     var selectedSquares = Session.get('boardPageselectedSquares');
+    var selectedGames = Session.get('boardPageselectedGames');
+    var games = Game.find().fetch();
+    var gameMatrix = getGamesMatrix(games);
+    console.log("games: ", games, gameMatrix)
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
@@ -80,7 +92,7 @@ Template.grid.helpers({
               // height: 1000//480
           },
           title: { text: '' },
-          xAxis: { //categories: winnerNumbers, 
+          xAxis: { categories: winnerNumbers, 
                    tickLength: 0,
                    minorTickLength: 0,
                    opposite: true, 
@@ -92,13 +104,9 @@ Template.grid.helpers({
                       },
                       // margin: 10,
                       // offset: 2
-                   },
-                   labels: {
-                    enabled: false,
-                    padding: 0
                    }
                  },
-          yAxis: { //categories: loserNumbers,  
+          yAxis: { categories: loserNumbers,  
                    tickLength: 0,
                    minorTickLength: 0,
                    title: {
@@ -107,10 +115,6 @@ Template.grid.helpers({
                         fontWeight: "bold",
                         fontSize: 30
                       }
-                   },
-                   labels: {
-                    enabled: false,
-                    padding: 0
                    }
                  },
           plotOptions: {
@@ -143,9 +147,18 @@ Template.grid.helpers({
           },
           tooltip: {
               formatter: function () {
-                var x = this.series.xAxis.categories[this.point.x];
-                var y = this.series.yAxis.categories[this.point.y];
-                  return "<b><u>Games Hit:</u></b><br>"// + gameData[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
+                var x = this.point.x;
+                var y = this.point.y;
+                // console.log(gameMatrix, x, y);
+                var games = gameMatrix[x][y];
+                var ret = "<b><u>Games Hit:</u></b><br>";
+                for (var i = 0; i < games.length; i++) {
+                  var game = games[i];
+                  ret += game.homeTeam.name + " " + game.homeScore + " " +
+                         game.awayTeam.name + " " + game.awayScore + "<br>"
+                }
+                return ret;
+                        //gameMatrix[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
               }
           },
           colorAxis: {
@@ -163,7 +176,8 @@ Template.grid.helpers({
               dataLabels: {
                 formatter: function () {
                       // only do this once per board to be uniform
-                      if (this.point.x==0 && this.point.y==0) {
+                      var square = {x: this.point.x, y: this.point.y};
+                      if (square.x==0 && square.y==0) {
                         var size = this.point.shapeArgs.height;
                         // console.log(this);
                         var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
@@ -171,11 +185,14 @@ Template.grid.helpers({
                         Session.set('size', {chars:  charactersPerLine, size: size});
                         // console.log('charperline: ', charactersPerLine);
                       }
+                      var squareScore = getSquareScoreFromMatrix(board, square, gameMatrix);
                       var charactersPerLine = Session.get('boardPageCharactersPerLine');
                       var text = this.point.value;
                       var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
                       // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
-                      return '<div class="js-ellipse" style="width:150px; overflow:hidden" title="' + text + '">' + formatted  + '</div>';
+                      return '<div class="js-ellipse" style="" title="' 
+                              + text + '">' + formatted + '<br>' + squareScore + '</br>' + '</div>'
+                              ;
                 },
                 allowOverlap: false,
                 enabled: true,
@@ -199,6 +216,16 @@ Template.grid.helpers({
           },            
       })
     });
+  }
+})
+
+Template.lockBoardButton.events({
+  'click #lockBoardButton': function(event) {
+    if (window.confirm('cannot undo')) {
+      Meteor.call('randomizeBoardNumbers', this._id, function(err, res) {
+        if (err) console.log(err);
+      })
+    }
   }
 })
 
@@ -301,13 +328,35 @@ Template.boardMemeberSelector.helpers({
 })
 
 
+Template.gameList.events({
+  "click .gameItems": function(event) {
+    var selectedGame = $(event.currentTarget).attr("data-id");
+    var games = Session.get('boardPageselectedGames');
 
+    if (!gameIsSelected(selectedGame)) 
+      games.push(selectedGame);                       // add
+    else
+      games.splice(games.indexOf(selectedGame), 1);   // remove
+
+    console.log("click .gameItems", games);
+    Session.set('boardPageselectedGames', games);
+  }
+})
 Template.gameList.helpers({
   games : function() {
     var games = Game.find();
     return games;
   }
 });
+Template.gameItem.helpers({
+  backgroundColor : function(){
+    var games = Session.get('boardPageselectedGames');
+    if (games.indexOf(this._id) != -1) {
+      return "blue";
+    }
+    return "white";
+  }
+})
 
 Template.memberList.helpers({
   members : function() {
@@ -327,27 +376,25 @@ Template.memberList.helpers({
 });
 Template.memberItem.helpers({
   name: function() {
-    if (typeof(this) == "String") return "member";
-    var member = Meteor.users.find(this._id);
-    return member.profile.userName;
+    if (this == "header") return "member";
+    return this.profile.userName;
   },
-  numSquares: function() {
-    if (typeof(this) == "String") return "#";
-    var member = Meteor.users.find(this._id);
-    var board = Board.findOne(this._id);
-    return getUserTotalNumSquares(board, member);    
+  numSquares: function(board) {
+    if (this == "header") return "#";
+    return getUserTotalNumSquares(board, this);    
   },
-  winnings: function() {
-    if (typeof(this) == "String") return "$";
-    var member = Meteor.users.find(this._id);
-    var board = Board.findOne(this._id);
-    var games = Games.find({gameType: board.gameType}).fetch()
-    return getUserWinnings(board, games, member);   
+  winnings: function(board) {
+    if (this == "header") return "$";
+    var games = Game.find({finished: true}).fetch();
+    var ret = getUserWinnings(board, games, this);
+    console.log("winnings: ", ret);
+    return ret;
   },
-  paid: function() {
-    if (typeof(this) == "String") return "paid";
-    var member = Meteor.users.find(this._id);
-    return getUserPaid(this, member)
+  paid: function(board) {
+    if (this == "header") return "paid";
+    var ret = getUserPaid(board, this);
+    console.log("paid: ", ret);
+    return getUserPaid(board, this)== true ? 'Y' : 'N'
   },
 })
 
@@ -364,13 +411,14 @@ Template.registerHelper('boardPageEditButtonDisabled',
   }
 );
 
+
 handleServerError = function handleServerError(err) {
   console.log(err);
   alert(err);
 }
 
 Template.registerHelper('printThis',
-  function() {
-    console.log(this);
+  function(name) {
+    console.log("printThis (" + name + "): " , this);
 })
 

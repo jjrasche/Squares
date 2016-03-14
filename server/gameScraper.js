@@ -1,13 +1,8 @@
 var Future = Npm.require("fibers/future");
-// // var express = Npm.require('express');
-// var phantomjs = Npm.require('phantomjs');
-// var page = Npm.require('webpage').create();
 var request = Npm.require('request');
 var cheerio = Npm.require('cheerio');
 var baseUrl = "http://espn.go.com/mens-college-basketball/scoreboard/";
 Meteor.methods({
-// Specs:KV(RPM/V): 920KVLipo cells:  3SDimensions: 28x31mmMax current: 255WMax Amps: 18ANo Load Current: 0.55A/10VNumber of Poles:  12/14Motor Shaft:  4mmprop shaft: CW/CCW 8mm/6mm threads quick release styleWeight: 58gbolt hole spacing: 16mm x 19mmLamination thickness: 0.2 mmMagnets: N45 SHBearing: EZO JapanBalancing spec: 0.005g
-// I20160222-20:24:38.592(-5)? Included:1 x CCW 2216 920kv motor1 x Anodised prop nut
 
   'scrapeGameData' : function scrape(args) {
     var url = baseUrl + "_/date/20150405";
@@ -70,6 +65,27 @@ Meteor.methods({
 //   });
 // })
 
+getRoundIndex = function getRoundIndex(roundName) {
+  switch(roundName) {
+    case "1st ROUND": 
+      return 0;
+    case "2ND ROUND": 
+      return 1;
+    case "3RD ROUND": 
+      return 2;
+    case "SWEET 16": 
+      return 3;
+    case "ELITE 8": 
+      return 4;
+    case "FINAL FOUR": 
+      return 5;
+    case "NATIONAL CHAMPIONSHIP": 
+      return 6;
+    default: 
+      throw new Meteor.Error("roundName not valid: " + roundName);
+  }
+}
+
 convertJsonToGames = function convertJsonToGames(json) {
   var games = json.events;
   var gameObjects = [];
@@ -78,7 +94,6 @@ convertJsonToGames = function convertJsonToGames(json) {
     var homeTeamData = game.competitions[0].competitors[0].homeAway=="home" ? game.competitions[0].competitors[0] : game.competitions[0].competitors[1];
     var awayTeam = homeTeam = {};
 
-    // console.log(JSON.stringify(homeTeamData));
     var awayTeam = {
       name: awayTeamData.team.shortDisplayName,
       record: {
@@ -96,15 +111,27 @@ convertJsonToGames = function convertJsonToGames(json) {
       seed: homeTeamData.curatedRank.current
     };
 
-    var game = {
+    var dbGame = {
       awayTeam: awayTeam,
       homeTeam: homeTeam,
       homeScore: homeTeamData.score,
       awayScore: awayTeamData.score,
-      date: new Date(game.competitions[0].startDate)
+      date: new Date(game.competitions[0].startDate),
+      finished: false
     }
 
-    gameObjects.push(game);
+    var locAndRound = game.competitions[0].notes[0].headline.split('-').map(function(s){ return s.trim() });
+    if (locAndRound.length == 3) {
+      dbGame.location = locAndRound[1];
+      // dbGame.NCAATournament = 
+      dbGame.round = getRoundIndex(locAndRound[2]);
+    }
+    else if (locAndRound.length == 2)
+      dbGame.round = getRoundIndex(locAndRound[1]);    
+    else 
+      throw new Meteor.Error("could not properly format (" + game.competitions[0].notes[0].headline + ")");  
+
+    gameObjects.push(dbGame);
   });
   return gameObjects;
 }
