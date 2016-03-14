@@ -56,14 +56,14 @@ Meteor.methods({
   }
 })
 
-// Meteor.startup(function() {
-//   Meteor.call('scrapeGameData', function(err, res) {
-//     if (err) console.log(err);
-//     if (res) {
-//       //console.log(res);
-//     }
-//   });
-// })
+Meteor.startup(function() {
+  Meteor.call('scrapeGameData', function(err, res) {
+    if (err) console.log(err);
+    if (res) {
+      //console.log(res);
+    }
+  });
+})
 
 getRoundIndex = function getRoundIndex(roundName) {
   switch(roundName) {
