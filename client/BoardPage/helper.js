@@ -25,6 +25,9 @@
     - annotating games as old
     - sortable member list
     - recording member activity 
+
+    - chat widget
+    - realtime board updates with changing game information
 */
 
 
@@ -82,7 +85,6 @@ Template.grid.helpers({
     var selectedGames = Session.get('boardPageselectedGames');
     var games = Game.find().fetch();
     var gameMatrix = getGamesMatrix(games);
-    console.log("games: ", games, gameMatrix)
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
@@ -145,7 +147,7 @@ Template.grid.helpers({
                           Session.set('boardPageselectedSquares', selectedSquares);
                         } 
                         else {
-                          console.log("event: ", board);
+                          // console.log("event: ", board);
                           Meteor.call('modifyBoard', board._id, Meteor.userId(), [{x,y}], function(err, res) {
                             if (err) 
                               handleServerError(err);
@@ -377,7 +379,7 @@ Template.memberList.helpers({
   members : function() {
     var memberIDs = this.members.map(function(m) {return m._id});
     var members = Meteor.users.find({_id: {$in: memberIDs}})
-    console.log("members: ", memberIDs, members);
+    // console.log("members: ", memberIDs, members);
     return members;
   },
   header : function() {
@@ -402,13 +404,11 @@ Template.memberItem.helpers({
     if (this == "header") return "$";
     var games = Game.find({finished: true}).fetch();
     var ret = getUserWinnings(board, games, this);
-    console.log("winnings: ", ret);
     return ret;
   },
   paid: function(board) {
     if (this == "header") return "paid";
     var ret = getUserPaid(board, this);
-    console.log("paid: ", ret);
     return getUserPaid(board, this)== true ? 'Y' : 'N'
   },
 })

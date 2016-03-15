@@ -3,7 +3,7 @@ Template.userBoardsList.helpers({
 		var ret;
 		if (!Meteor.user()) ret = [];
 		else ret = getUserBoards(Meteor.user());
-		console.log('userBoardsList: ', ret);
+		// console.log('userBoardsList: ', ret);
 		return ret;
 	}
 })
@@ -11,7 +11,7 @@ Template.userBoardsList.helpers({
 
 Template.userBoard.helpers({
 	boardName: function() {
-		console.log("boardName: ", this);
+		// console.log("boardName: ", this);
 		return this.name;
 	},
 	boardLink: function() {
