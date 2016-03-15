@@ -84,7 +84,7 @@ Template.grid.helpers({
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
     var games = Game.find().fetch();
-    var gameMatrix = getGamesMatrix(games);
+    var gameMatrix = getGamesMatrix(board, games);
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
