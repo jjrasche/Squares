@@ -18,6 +18,13 @@
     - be able to select a game from gameList or member from memberlist and highlight all effected squares
     - enable/test realtime game updates
     - enforce square numbers
+
+    priorities for beta:
+    X ensuring login works with usernames
+    - data entry 
+    - annotating games as old
+    - sortable member list
+    - recording member activity 
 */
 
 
@@ -123,8 +130,8 @@ Template.grid.helpers({
               series: {
                   events: {
                       click: function(e) {
-                        var x = this.series.xAxis.categories[e.point.x]; 
-                        var y = this.series.yAxis.categories[e.point.y];
+                        var x = e.point.x; 
+                        var y = e.point.y;
 
                         // if in edit mode, change color of selected squares save in session
                         if (Session.get('boardPageEditMode')) {
@@ -153,7 +160,6 @@ Template.grid.helpers({
                 var x = this.point.x;
                 var y = this.point.y;
                 var realx = this;
-                console.log(x, y, this.series.yAxis.categories[this.point.y]);
                 var games = gameMatrix[x][y];
                 var ret = "<b><u>Games Hit:</u></b><br>";
                 for (var i = 0; i < games.length; i++) {
@@ -243,7 +249,7 @@ Template.invitePlayersModal.events({
   'submit #invitePlayerForm' : function(event) {
     event.preventDefault();
     var squares = Session.get('boardPageselectedSquares');
-    var email = event.target.email.value;
+    var email = event.target.email.value == '' ? null : event.target.email.value;
     var userName = event.target.userName.value;
     var board = getBoard();
     var boardID = board._id;
@@ -251,9 +257,14 @@ Template.invitePlayersModal.events({
     console.log("submit #invitePlayerForm  this: ", this, userName, email);
 
     // if email address is attached to user and user already a member, error
-    var existingUser = Meteor.users.findOne({emails: {$in: [email]}});
-    if (existingUser && userIsMemberOfBoard(board, existingUser))
+    var existingUser = Meteor.users.findOne({$and: [
+      {'emails.address': {$in: [null]}}, 
+      {'emails.address': {$exists: true}}
+      ]})
+    if (existingUser && userIsMemberOfBoard(board, existingUser)) {
+      console.log("existingUser: ", existingUser);
       throw new Meteor.Error("User already on board, try re-assigning squares");
+    }
 
     // create user if doesn't exist
     if (!existingUser) {

@@ -1,5 +1,6 @@
 Accounts.ui.config({
     requestPermissions: {},
+    passwordSignupFields: 'USERNAME_AND_EMAIL',
     extraSignupFields: [{
         fieldName: 'userName',
         fieldLabel: 'user name',
@@ -17,3 +18,13 @@ Accounts.ui.config({
         }
     }]
 });
+
+
+Accounts._loginButtons.validateUsername = function(username) {
+    if (username.length >= 2) {
+        return true;
+    } else {
+        loginButtonsSession.errorMessage(i18n('errorMessages.usernameTooShort'));
+        return false;
+    }
+};
