@@ -403,10 +403,10 @@ Template.memberList.helpers({
   members : function() {
     var memberIDs = this.members.map(function(m) {return m._id});
     var sortData = Session.get('boardPageMemberListSort');
-    var sortObj = {sort: {}};
+    var sortObj = {sort: {'status.online': -1}};
     sortObj.sort[sortData.prop] = sortData.order;
 
-
+    console.log("memberList: ", sortObj);
     var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
     // console.log("members: ", members.fetch());
 
@@ -448,7 +448,11 @@ Template.memberItem.helpers({
   },
   nameClass: function() {
     if (this == "header") return "memberListHeaderName";
-    return "memberListName";
+    var classes = "memberListName";
+    if (this.status && this.status.online) {
+      classes += " memberOnline"
+    }
+    return classes;
   },
   numSquaresClass: function() {
     if (this == "header") return "memberListHeaderNumSquares";

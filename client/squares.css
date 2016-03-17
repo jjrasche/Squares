@@ -18,6 +18,10 @@
     padding-bottom: 32767px;
 }
 
+.memberOnline {
+  color: green;
+  font-weight: bold;
+}
 
 .memberListHeader {
   text-decoration: underline;
