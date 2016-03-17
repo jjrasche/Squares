@@ -18,6 +18,12 @@
     padding-bottom: 32767px;
 }
 
+
+.memberListHeader {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
 /*.row > [class*="col-"]{
     margin-bottom: -10000px;
     padding-bottom: 10000px;

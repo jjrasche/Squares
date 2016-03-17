@@ -38,11 +38,11 @@
 </template>
 <template name="memberItem">
 	<li class="list-group-item nopadding">
-		<div class="row nopadding" style="background-color: grey"> 
-			<div class="col-xs-7 " style="background-color: orange">{{name }}</div>
-			<div class="col-xs-1 nopadding" style="text-align: center;background-color: green">{{numSquares ..}}</div>
-			<div class="col-xs-2 nopadding" style="text-align: center;background-color: yellow">{{winnings ..}}</div>
-			<div class="col-xs-2 nopadding" style="text-align: center;background-color: red">{{paid ..}}</div>
+		<div class="row nopadding {{headerClass}}"> 
+			<div class="col-xs-7 {{nameClass}}" style="background-color: orange">{{name }}</div>
+			<div class="col-xs-1 {{numSquaresClass}} nopadding" style="text-align: center;background-color: green">{{numSquares ..}}</div>
+			<div class="col-xs-2 {{winningsClass}} nopadding" style="text-align: center;background-color: yellow">{{winnings ..}}</div>
+			<div class="col-xs-2 {{paidClass}} nopadding" style="text-align: center;background-color: red">{{paid ..}}</div>
 		</div>
 	</li>
 </template>

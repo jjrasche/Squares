@@ -21,10 +21,11 @@
 
     priorities for beta:
     X ensuring login works with usernames
-    - data entry 
+    X data entry 
+    X correct games mapping
     - annotating games as old
     - sortable member list
-    - recording member activity 
+    X recording member activity 
 
     - chat widget
     - realtime board updates with changing game information
@@ -35,6 +36,8 @@ Session.set('boardPageselectedSquares', []);
 Session.set('boardPageselectedGames', []);
 Session.set('boardPageselectedMembers', []);
 Session.set('boardPageEditMode', false);
+Session.set('boardPageMemberListSort', {prop: 'profile.userName', order: 1});
+
 
 Template.editCheckBox.events({
   'click #editCheckBox' : function(event){
@@ -378,7 +381,15 @@ Template.gameItem.helpers({
 Template.memberList.helpers({
   members : function() {
     var memberIDs = this.members.map(function(m) {return m._id});
-    var members = Meteor.users.find({_id: {$in: memberIDs}})
+    var sortData = Session.get('boardPageMemberListSort');
+    var sortObj = {sort: {}};
+    sortObj.sort[sortData.prop] = sortData.order;
+
+    console.log("memberIDs: ", memberIDs);
+
+    var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
+    console.log("members: ", members.fetch());
+
     // console.log("members: ", memberIDs, members);
     return members;
   },
@@ -411,7 +422,64 @@ Template.memberItem.helpers({
     var ret = getUserPaid(board, this);
     return getUserPaid(board, this)== true ? 'Y' : 'N'
   },
-})
+  headerClass: function() {
+    if (this == "header") return "memberListHeader";
+    return "";
+  },
+  nameClass: function() {
+    if (this == "header") return "memberListHeaderName";
+    return "memberListName";
+  },
+  numSquaresClass: function() {
+    if (this == "header") return "memberListHeaderNumSquares";
+    return "memberListNumSquares";
+  },
+  winningsClass: function() {
+    if (this == "header") return "memberListHeaderWinnings";
+    return "memberListWinnings";
+  },
+  paidClass: function() {
+    if (this == "header") return "memberListHeaderPaid";
+    return "memberListPaid";
+  }
+});
+Template.memberItem.events({
+  // for any of the header clicks, sort by that row
+  "click .memberListHeaderName": function(event) {
+    var currSort = Session.get('boardPageMemberListSort');
+    var currOrder = currSort.order;
+    var newSort;
+    var newProp = 'profile.userName';
+
+    // if sorting same property, inverse the sort
+    if (currSort.prop == newProp) {
+      var newOrder = currOrder==1 ? -1 : 1
+      newSort = {prop: newProp, order: newOrder};
+    }
+    else 
+      newSort = {prop: newProp, order: 1}
+
+    Session.set('boardPageMemberListSort', newSort);
+    console.log("click .memberListHeaderName", newSort);
+  },
+  "click .memberListHeaderNumSquares": function(event) {
+    var currSort = Session.get('boardPageMemberListSort');
+    var currOrder = currSort.order;
+    var newSort;
+    var newProp = 'profile.userName';
+
+    // if sorting same property, inverse the sort
+    if (currSort.prop == newProp) {
+      var newOrder = currOrder==1 ? -1 : 1
+      newSort = {prop: newProp, order: newOrder};
+    }
+    else 
+      newSort = {prop: newProp, order: 1}
+
+    Session.set('boardPageMemberListSort', newSort);
+    console.log("click .memberListHeaderName", newSort);
+  },
+});
 
 
 
