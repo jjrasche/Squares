@@ -98,7 +98,7 @@ Template.grid.helpers({
 
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
-    var games = getGames(null, []);
+    var games = getGames(null, [{finished: true}]);
     console.log('createChart games: ', games.length, games);
     var gameMatrix = getGamesMatrix(board, games);
       // Use Meteor.defer() to craete chart after DOM is ready:
@@ -433,9 +433,10 @@ Template.memberItem.helpers({
   },
   winnings: function(board) {
     if (this == "header") return "$";
-    var games = Game.find({finished: true},);//getGames(null, [{finished: true}]);
-    var ret = getUserWinnings(board, games, this);
-    return ret;
+    var games = getGames(null, [{finished: true}]);
+    var winnings = getUserWinnings(board, games, this);
+    console.log("winnings: ", JSON.stringify(games), winnings);
+    return winnings;
   },
   paid: function(board) {
     if (this == "header") return "paid";
