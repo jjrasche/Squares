@@ -51,6 +51,8 @@
 <template name="editWidget">
 	{{#if boardOwner}}
 		{{> lockBoardButton}}
+		{{> reloadGamesButton}}
+		{{> changeDataRefreshRate}}
 		{{> editCheckBox}} <br>
 		{{> invitePlayersModal}}
 		{{> assignSquaresModal}}
@@ -63,16 +65,22 @@
 <template name="editCheckBox">
 	Edit Mode<input type="checkbox"  id="editCheckBox">
 </template>
-
+<template name="changeDataRefreshRate">
+	Refresh Rate (sec)<input type="number" name='changeDataRefreshRate' id="changeDataRefreshRate" min="5" max="3600">
+</template>
 <template name="BoardName">
 	{{this.name}}
 </template>
 
 
+
+
 <template name="lockBoardButton">
 	<button class="btn btn-warning" id="lockBoardButton">Lock Board</button>
 </template>
-
+<template name="reloadGamesButton">
+	<button class="btn btn-warning" id="reloadGamesButton">Reload Games</button>
+</template>
 
 <template name="invitePlayersModal">
 	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="invitePlayersButton">Invite</button>

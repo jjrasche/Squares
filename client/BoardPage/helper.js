@@ -52,7 +52,19 @@ Template.editCheckBox.events({
     console.log(Session.get('boardPageEditMode'));
   }
 })
+Template.changeDataRefreshRate.events({
+  'keypress #changeDataRefreshRate' : function(event, template){
+    // if enter do thing
+    if (event.which === 13) {
+      var seconds = template.find("#changeDataRefreshRate").value
+      console.log("changeDataRefreshRate: ", seconds);
 
+      Meteor.call('changeScrapeRate', seconds, function(err, res) {
+        if (err) console.log(err);
+      })
+    }
+  }
+})
 // Template.assignSquaresModal.events({
 //   'click #assignSelectedSquares' : function(event){
 //     //event.preventDefault();
@@ -86,7 +98,8 @@ Template.grid.helpers({
 
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
-    var games = Game.find().fetch();
+    var games = getGames(null, []);
+    console.log('createChart games: ', games.length, games);
     var gameMatrix = getGamesMatrix(board, games);
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
@@ -243,6 +256,13 @@ Template.lockBoardButton.events({
     }
   }
 })
+Template.reloadGamesButton.events({
+  'click #reloadGamesButton': function(event) {
+    Meteor.call('scrapeGameData', function(err, res) {
+      if (err) console.log(err);
+    })
+  }
+})
 
 Template.invitePlayersModal.events({
   'click #invitePlayersButton' : function(event){
@@ -364,7 +384,8 @@ Template.gameList.events({
 })
 Template.gameList.helpers({
   games : function() {
-    var games = Game.find();
+    var games = getGames(null, []);
+    console.log('gameList: ', games.length, games);
     return games;
   }
 });
@@ -385,10 +406,9 @@ Template.memberList.helpers({
     var sortObj = {sort: {}};
     sortObj.sort[sortData.prop] = sortData.order;
 
-    console.log("memberIDs: ", memberIDs);
 
     var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
-    console.log("members: ", members.fetch());
+    // console.log("members: ", members.fetch());
 
     // console.log("members: ", memberIDs, members);
     return members;
@@ -413,7 +433,7 @@ Template.memberItem.helpers({
   },
   winnings: function(board) {
     if (this == "header") return "$";
-    var games = Game.find({finished: true}).fetch();
+    var games = Game.find({finished: true},);//getGames(null, [{finished: true}]);
     var ret = getUserWinnings(board, games, this);
     return ret;
   },
