@@ -1,4 +1,16 @@
 /* CSS declarations go here */
+#chatWrapper {
+  height: 100px;
+  overflow:auto; 
+}
+
+#chapp_wrapper {
+  height: 100px;
+}
+#chapp-form {
+  min-height:30px;
+}
+
 .nopadding {
    padding: 0;
    margin: 0;

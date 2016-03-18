@@ -99,7 +99,6 @@ Template.grid.helpers({
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
     var games = getGames(null, [{finished: true}]);
-    console.log('createChart games: ', games.length, games);
     var gameMatrix = getGamesMatrix(board, games);
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
@@ -385,7 +384,7 @@ Template.gameList.events({
 Template.gameList.helpers({
   games : function() {
     var games = getGames(null, []);
-    console.log('gameList: ', games.length, games);
+    // console.log('gameList: ', games.length, games);
     return games;
   }
 });
@@ -406,7 +405,7 @@ Template.memberList.helpers({
     var sortObj = {sort: {'status.online': -1}};
     sortObj.sort[sortData.prop] = sortData.order;
 
-    console.log("memberList: ", sortObj);
+    // console.log("memberList: ", sortObj);
     var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
     // console.log("members: ", members.fetch());
 
@@ -435,7 +434,6 @@ Template.memberItem.helpers({
     if (this == "header") return "$";
     var games = getGames(null, [{finished: true}]);
     var winnings = getUserWinnings(board, games, this);
-    console.log("winnings: ", JSON.stringify(games), winnings);
     return winnings;
   },
   paid: function(board) {
