@@ -52,14 +52,16 @@ Template.editCheckBox.events({
     console.log(Session.get('boardPageEditMode'));
   }
 })
-Template.changeDataRefreshRate.events({
-  'keypress #changeDataRefreshRate' : function(event, template){
+Template.changeDataRefreshCriteria.events({
+  'keypress #changeDataRefreshCriteria' : function(event, template){
     // if enter do thing
     if (event.which === 13) {
-      var seconds = template.find("#changeDataRefreshRate").value
-      console.log("changeDataRefreshRate: ", seconds);
+      var rate = template.find("#changeDataRefreshRate").value
+      var date = template.find("#RefreshSelectedDate").value
 
-      Meteor.call('changeScrapeRate', seconds, function(err, res) {
+      console.log("changeDataRefreshCriteria: ", rate, date);
+
+      Meteor.call('changeDataRefreshCriteria', rate, date, function(err, res) {
         if (err) console.log(err);
       })
     }

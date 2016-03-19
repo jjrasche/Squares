@@ -51,7 +51,7 @@
 	{{#if boardOwner}}
 		{{> lockBoardButton}}
 		{{> reloadGamesButton}}
-		{{> changeDataRefreshRate}}
+		{{> changeDataRefreshCriteria}}
 		{{> editCheckBox}} <br>
 		{{> invitePlayersModal}}
 		{{> assignSquaresModal}}
@@ -64,9 +64,11 @@
 <template name="editCheckBox">
 	Edit Mode<input type="checkbox"  id="editCheckBox">
 </template>
-<template name="changeDataRefreshRate">
-	Refresh Rate (sec)<input type="number" name='changeDataRefreshRate' id="changeDataRefreshRate" min="5" max="3600">
+<template name="changeDataRefreshCriteria">
+	Refresh Rate (sec)<input type="number" id="changeDataRefreshRate" min="5" max="3600">
+	Refresh Date<input type="date" id="RefreshSelectedDate">
 </template>
+
 <template name="BoardName">
 	<h3 style="text-align: center;">
 		{{this.name}}
