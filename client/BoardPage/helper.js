@@ -24,7 +24,7 @@
     X data entry 
     X correct games mapping
     - annotating games as old
-    - sortable member list
+    X sortable member list
     X recording member activity 
 
     - chat widget
@@ -100,7 +100,7 @@ Template.grid.helpers({
 
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
-    var games = getGames(null, [{finished: true}]);
+    var games = getGames([{finished: true}]);
     var gameMatrix = getGamesMatrix(board, games);
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
@@ -383,9 +383,11 @@ Template.gameList.events({
     Session.set('boardPageselectedGames', games);
   }
 })
+
+todaysGamesQuery = [{date: {$gte: getBeginningTodayDate(), $lt: getEndTodayDate()}}];
 Template.gameList.helpers({
   games : function() {
-    var games = getGames(null, []);
+    var games = getGames(todaysGamesQuery, {finisehd: 1});
     // console.log('gameList: ', games.length, games);
     return games;
   }
@@ -434,7 +436,7 @@ Template.memberItem.helpers({
   },
   winnings: function(board) {
     if (this == "header") return "$";
-    var games = getGames(null, [{finished: true}]);
+    var games = getGames([{finished: true}]);
     var winnings = getUserWinnings(board, games, this);
     return winnings;
   },
