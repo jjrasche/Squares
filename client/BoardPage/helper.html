@@ -19,10 +19,44 @@
 	</ul>
 </template>
 <template name="gameItem">
-	<li class="list-group-item gameItems" name="gameItem" data-id={{this._id}} style="background-color: {{backgroundColor}}">
-		{{this.homeScore}} {{this.homeTeam.name}} <br>
-		{{this.awayScore}} {{this.awayTeam.name}}
+	<li class="list-group-item gameItems nopadding" name="gameItem" data-id={{this._id}} style="background-color: {{backgroundColor}}">
+		<div class="row nopadding"> 
+			<div class="col-xs-10 nopadding">		
+				{{> teamScoreNameView score=this.awayScore teamName=this.awayTeam.name}}
+				{{> teamScoreNameView score=this.homeScore teamName=this.homeTeam.name}}
+			</div>
+			<div class="col-xs-2 nopadding">
+				{{> gameTimeView}}
+			</div>		
+		</div>
 	</li>
+</template>
+<template name="teamScoreNameView">
+	<div class="row nopadding">
+		<div class="col-xs-2 nopadding">
+			{{score}} 
+		</div>
+		<div class="col-xs-10 nopadding">
+			{{teamName}}
+		</div>
+	</div>
+</template>
+<template name="gameTimeView">
+	{{#if gameStarted}}
+		{{#if gameFinished}}
+			Final
+		{{else}}
+			<div class="row nopadding">
+				{{getPeriod}}
+			</div>
+			<div class="row nopadding">
+				{{getClock}}
+			</div>
+		{{/if}}
+	{{else}}
+		{{getStartTime}}
+	{{/if}}
+
 </template>
 
 

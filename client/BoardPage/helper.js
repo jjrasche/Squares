@@ -53,13 +53,13 @@ Template.editCheckBox.events({
   }
 })
 Template.changeDataRefreshCriteria.events({
-  'keypress #changeDataRefreshCriteria' : function(event, template){
+  'keypress #changeDataRefreshRate' : function(event, template){
     // if enter do thing
     if (event.which === 13) {
       var rate = template.find("#changeDataRefreshRate").value
       var date = template.find("#RefreshSelectedDate").value
-
-      console.log("changeDataRefreshCriteria: ", rate, date);
+      
+      console.log("changeDataRefreshRate: ", rate, date);
 
       Meteor.call('changeDataRefreshCriteria', rate, date, function(err, res) {
         if (err) console.log(err);
@@ -382,12 +382,12 @@ Template.gameList.events({
     console.log("click .gameItems", games);
     Session.set('boardPageselectedGames', games);
   }
-})
+});
 
 todaysGamesQuery = [{date: {$gte: getBeginningTodayDate(), $lt: getEndTodayDate()}}];
 Template.gameList.helpers({
   games : function() {
-    var games = getGames(todaysGamesQuery, {finisehd: 1});
+    var games = getGames(todaysGamesQuery, {finished: 1});
     // console.log('gameList: ', games.length, games);
     return games;
   }
@@ -399,6 +399,41 @@ Template.gameItem.helpers({
       return "blue";
     }
     return "white";
+  }
+})
+Template.gameTimeView.helpers({
+  gameStarted : function() {
+    var started = (this.time.period != 0);
+    return started;
+  },
+  getClock : function() {
+    var min = Math.floor(this.time.secLeft/60);
+    var sec = (this.time.secLeft % 60).format2DigitString();
+    return min + ":" + sec;
+  },
+  getPeriod : function() {
+    switch(this.time.period) {
+      case 0:
+        return;
+      case 1:
+        return '1st';
+      case 2:
+        return '2nd'; 
+      case 3:
+        return '3rd';
+      case 4:
+        return '4th';   
+      default: 
+        throw new Meteor.Error("invalid value for period '" + this.time.period + "'"); 
+    }
+  },
+  getStartTime : function() {
+    var date = (this.date.getMonth()+1) + '/' + this.date.getDate();
+    var time = this.date.getHours() + ':' + this.date.getMinutes();
+    return date + ' ' + time;
+  },
+  gameFinished : function() {
+    return this.finished;
   }
 })
 
