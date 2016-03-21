@@ -384,11 +384,10 @@ Template.gameList.events({
   }
 });
 
-todaysGamesQuery = [{date: {$gte: getBeginningTodayDate(), $lt: getEndTodayDate()}}];
+todaysGamesQuery = [{date: {$gte: getMostRecentGameDate(), $lt: getEndTodayDate()}}];
 Template.gameList.helpers({
   games : function() {
     var games = getGames(todaysGamesQuery, {finished: 1});
-    // console.log('gameList: ', games.length, games);
     return games;
   }
 });
