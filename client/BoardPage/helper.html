@@ -83,13 +83,15 @@
 
 <template name="editWidget">
 	{{#if boardOwner}}
-		{{> lockBoardButton}}
-		{{> reloadGamesButton}}
-		{{> changeDataRefreshCriteria}}
-		{{> editCheckBox}} <br>
+		{{> editCheckBox}}
+		<br>
 		{{> invitePlayersModal}}
-		{{> assignSquaresModal}}
 		{{> changeBoardOwnershipModal}}
+		<br>
+		{{> lockBoardButton}}
+		{{> assignSquaresModal}}
+		<br>
+		{{> changeRefreshCriteria}}
 <!-- 		{{selectedSquares}}
 		{{squareSize}} -->
 	{{/if}}
@@ -98,10 +100,21 @@
 <template name="editCheckBox">
 	Edit Mode<input type="checkbox"  id="editCheckBox">
 </template>
-<template name="changeDataRefreshCriteria">
-	Refresh Rate (sec)<input type="number" id="changeDataRefreshRate" min="5" max="3600">
-	Refresh Date<input type="date" id="RefreshSelectedDate">
+<template name="changeRefreshCriteria">
+	{{> changeRefreshRate}}
+	{{> refreshBetweenDates}}
+	<button id="RefreshSelectedDateRangeButton">Refresh Between Dates</button>
 </template>
+<template name="changeRefreshRate">
+	Refresh Rate (sec)<input type="number" id="changeRefreshRate" min="5" max="3600">
+</template>
+<template name="refreshBetweenDates">
+	Refresh Date<br>
+	StartDate: <input type="date" id="RefreshSelectedStartDate"><br>
+	EndDate: <input type="date" id="RefreshSelectedEndDate">
+</template>
+
+
 
 <template name="BoardName">
 	<h3 style="text-align: center;">
@@ -114,9 +127,6 @@
 
 <template name="lockBoardButton">
 	<button class="btn btn-warning" id="lockBoardButton">Lock Board</button>
-</template>
-<template name="reloadGamesButton">
-	<button class="btn btn-warning" id="reloadGamesButton">Reload Games</button>
 </template>
 
 <template name="invitePlayersModal">

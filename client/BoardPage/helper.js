@@ -52,16 +52,25 @@ Template.editCheckBox.events({
     console.log(Session.get('boardPageEditMode'));
   }
 })
-Template.changeDataRefreshCriteria.events({
-  'keypress #changeDataRefreshRate' : function(event, template){
+Template.changeRefreshCriteria.events({
+  'keypress #changeRefreshRate' : function(event, template){
     // if enter do thing
     if (event.which === 13) {
-      var rate = template.find("#changeDataRefreshRate").value
-      var date = template.find("#RefreshSelectedDate").value
-      
-      console.log("changeDataRefreshRate: ", rate, date);
-
-      Meteor.call('changeDataRefreshCriteria', rate, date, function(err, res) {
+      var rate = template.find("#changeRefreshRate").value
+      console.log("changeRefreshRate: ", rate, date);
+      Meteor.call('changeRefreshRate', rate, function(err, res) {
+        if (err) console.log(err);
+      })
+    }
+  },
+  'click #RefreshSelectedDateRangeButton' : function(event, template){
+    // if enter do thing
+    var startDate = template.find("#RefreshSelectedStartDate").value
+    var endDate = template.find("#RefreshSelectedEndDate").value
+    console.log("in  here: ", startDate, endDate);
+    if (startDate && endDate) {
+      console.log("changeRefreshRate: ");
+      Meteor.call('refreshGamesBetweenDates', new Date(startDate), new Date(endDate), function(err, res) {
         if (err) console.log(err);
       })
     }
@@ -256,14 +265,7 @@ Template.lockBoardButton.events({
       })
     }
   }
-})
-Template.reloadGamesButton.events({
-  'click #reloadGamesButton': function(event) {
-    Meteor.call('scrapeGameData', function(err, res) {
-      if (err) console.log(err);
-    })
-  }
-})
+});
 
 Template.invitePlayersModal.events({
   'click #invitePlayersButton' : function(event){
@@ -384,10 +386,9 @@ Template.gameList.events({
   }
 });
 
-todaysGamesQuery = [{date: {$gte: getMostRecentGameDate(), $lt: getEndTodayDate()}}];
 Template.gameList.helpers({
   games : function() {
-    var games = getGames(todaysGamesQuery, {finished: 1});
+    var games = getGames(mostRecentDaysQuery(), {finished: 1});
     return games;
   }
 });
@@ -537,7 +538,7 @@ Template.memberItem.events({
     else 
       newSort = {prop: newProp, order: 1}
 
-    Session.set('boardPageMemberListSort', newSort);
+    // Session.set('boardPageMemberListSort', newSort);
     console.log("click .memberListHeaderName", newSort);
   },
 });
