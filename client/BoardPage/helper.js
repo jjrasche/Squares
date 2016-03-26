@@ -192,8 +192,9 @@ Template.grid.helpers({
                 var ret = "<b><u>Games Hit:</u></b><br>";
                 for (var i = 0; i < games.length; i++) {
                   var game = games[i];
-                  ret += game.homeTeam.name + " " + game.homeScore + " " +
-                         game.awayTeam.name + " " + game.awayScore + "<br>"
+                  ret +=  "(" + getGamePoints(board, game) + ")" + 
+                          game.homeTeam.name + " " + game.homeScore + " " +
+                          game.awayTeam.name + " " + game.awayScore + "<br>"
                 }
                 return ret;
                         //gameMatrix[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
