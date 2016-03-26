@@ -388,7 +388,7 @@ Template.gameList.events({
 
 Template.gameList.helpers({
   games : function() {
-    var games = getGames(mostRecentDaysQuery(), {finished: 1});
+    var games = getGames(mostRecentWeeksQuery(), {finished: 1});
     return games;
   }
 });
