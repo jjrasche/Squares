@@ -57,7 +57,7 @@ Template.changeRefreshCriteria.events({
     // if enter do thing
     if (event.which === 13) {
       var rate = template.find("#changeRefreshRate").value
-      console.log("changeRefreshRate: ", rate, date);
+      console.log("changeRefreshRate: ", rate);
       Meteor.call('changeRefreshRate', rate, function(err, res) {
         if (err) console.log(err);
       })
@@ -67,9 +67,8 @@ Template.changeRefreshCriteria.events({
     // if enter do thing
     var startDate = template.find("#RefreshSelectedStartDate").value
     var endDate = template.find("#RefreshSelectedEndDate").value
-    console.log("in  here: ", startDate, endDate);
     if (startDate && endDate) {
-      console.log("changeRefreshRate: ");
+      console.log("RefreshSelectedDateRange: ", startDate, endDate);
       Meteor.call('refreshGamesBetweenDates', new Date(startDate), new Date(endDate), function(err, res) {
         if (err) console.log(err);
       })
