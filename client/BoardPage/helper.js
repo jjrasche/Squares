@@ -85,7 +85,7 @@ Template.changeRefreshCriteria.events({
 
 Template.editWidget.helpers({
   boardOwner: function() {
-    return isOwner(getBoard(), Meteor.user());
+    return getBoard().isOwner(Meteor.user());
   },
   squareSize: function () {
     return JSON.stringify(Session.get('size'));
@@ -108,8 +108,7 @@ Template.grid.helpers({
 
     var selectedSquares = Session.get('boardPageselectedSquares');
     var selectedGames = Session.get('boardPageselectedGames');
-    var games = getGames([{finished: true}]);
-    var gameMatrix = getGamesMatrix(board, games);
+    var gameMatrix = board.gamesMatrix()
       // Use Meteor.defer() to craete chart after DOM is ready:
       Meteor.defer(function() {
         // Create standard Highcharts chart with options:
@@ -210,7 +209,7 @@ Template.grid.helpers({
               title: '',
               borderWidth: 3,
               backgroundColor: '#303030',
-              data: formatBoardData(),
+              data: board.formatData(),
               dataLabels: {
                 formatter: function () {
                       // only do this once per board to be uniform
@@ -223,7 +222,7 @@ Template.grid.helpers({
                         Session.set('size', {chars:  charactersPerLine, size: size});
                         // console.log('charperline: ', charactersPerLine);
                       }
-                      var squareScore = getSquareScoreFromMatrix(board, square, gameMatrix);
+                      var squareScore = board.squareTotalWinnings(square, gameMatrix);
                       var charactersPerLine = Session.get('boardPageCharactersPerLine');
                       var text = this.point.value;
                       var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
@@ -289,7 +288,7 @@ Template.invitePlayersModal.events({
       {'emails.address': {$in: [null]}}, 
       {'emails.address': {$exists: true}}
       ]})
-    if (existingUser && userIsMemberOfBoard(board, existingUser)) {
+    if (existingUser && board.boardMember(existingUser)) {
       console.log("existingUser: ", existingUser);
       throw new Meteor.Error("User already on board, try re-assigning squares");
     }
@@ -366,7 +365,7 @@ Template.changeBoardOwnershipModal.events({
 
 Template.boardMemeberSelector.helpers({
   boardMembers : function() {
-    return getBoardMemberUsers(this);
+    return this.getUsers();
   }
 })
 
@@ -467,18 +466,18 @@ Template.memberItem.helpers({
   },
   numSquares: function(board) {
     if (this == "header") return "#";
-    return getUserTotalNumSquares(board, this);    
+    return board.memberNumSquares(this);    
   },
   winnings: function(board) {
     if (this == "header") return "$";
     var games = getGames([{finished: true}]);
-    var winnings = getUserWinnings(board, games, this);
+    var winnings = board.memberWinnings(games, this);
     return winnings;
   },
   paid: function(board) {
     if (this == "header") return "paid";
-    var ret = getUserPaid(board, this);
-    return getUserPaid(board, this)== true ? 'Y' : 'N'
+    var ret = board.memberPaid(this);
+    return ret == true ? 'Y' : 'N'
   },
   headerClass: function() {
     if (this == "header") return "memberListHeader";
