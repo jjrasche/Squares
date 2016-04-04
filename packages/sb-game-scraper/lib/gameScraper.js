@@ -1,43 +1,3 @@
-unfinishedGamesQuery = [ 
-  {'finished': false}
-];
-
-yesterdayGamesQuery = [ 
-  {'date': {
-    $gte: getBeginningYesterdayDate(),
-    $lt: getBeginningTodayDate()
-  }}
-];
-
-yesterdaysGamesUnfinishedQuery = 
-  unfinishedGamesQuery.concat(
-    yesterdayGamesQuery);
-
-// same teams same day 
-gameExistsQuery = function gameExistsQuery(game) {
-  return [
-    {'homeTeam.name': game.homeTeam.name},
-    {'awayTeam.name': game.awayTeam.name},
-    {'date': {
-      $gte: game.date.getClearedTimeOfDateTime(),
-      $lte: game.date.getMaxTimeOfDateTime()
-    }}
-  ];
-}
-
-mostRecentDaysQuery = function mostRecentDaysQuery() {
-  var mostRecentGameDate = getMostRecentGameDate();
-  if (!mostRecentGameDate) return [];
-  return [{date: {$gte: mostRecentGameDate, $lt: getEndTodayDate()}}];
-}
-
-mostRecentWeeksQuery = function mostRecentWeeksQuery() {
-  var mostRecentGameDate = getMostRecentGameDate();
-  if (!mostRecentGameDate) return [];
-  var mostRecentMonday = mostRecentGameDate.getMostRecentMonday().getClearedTimeOfDateTime();
-  return [{date: {$gte: mostRecentMonday, $lt: getEndTodayDate()}}];
-}
-
 DEFAULT_DATA_REFRESH = 30000000; 
 // retrieve new game data at set interval
 var automateGameData
@@ -86,9 +46,8 @@ Meteor.methods({
         throw new Meteor.Error("startDate '" + startDate + "' cannot be greater than endDate '" + endDate + "'");
 
       // if unfinished games from the day before, look at yesterday's page too
-      if (Game.find({$and: yesterdaysGamesUnfinishedQuery}).count()) {
+      if (SB.Game.find({$and: SB.Game.query.yesterdayUnfinished}).count()) {
         startDate.addDays(-1);
-        console.log("yesterdaysGamesUnfinishedQuery: ", startDate);
       }
 
       var games = [];
@@ -138,15 +97,15 @@ Meteor.methods({
 
 insertOrUpdateGame = function insertOrUpdateGame(game) {
   // attempt to find game. Unique = (homeTeam, awayTeam, started same day)
-  var beginningOfDay = getBeginningTodayDate();
-  var endOfDay = getEndTodayDate();
+  var beginningOfDay = SB.Date.beginningToday();
+  var endOfDay = SB.Date.endToday();
 
-  var exists = Game.findOne({
-    $and: gameExistsQuery(game)
+  var exists = SB.Game.findOne({
+    $and: SB.Game.query.function.exists(game)
   });
 
   if (exists) {
-    var ret = Game.update({_id: exists._id},{
+    var ret = SB.Game.update({_id: exists._id},{
       $set: {
         'homeScore': game.homeScore,
         'awayScore': game.awayScore,
@@ -159,7 +118,7 @@ insertOrUpdateGame = function insertOrUpdateGame(game) {
     console.log("updated: ", exists._id, game.homeScore + ' ' + game.awayScore + ' ' + game.date + ' ' + game.finished, game.time);
   }
   else {
-    var ret = Game.insert(game);
+    var ret = SB.Game.insert(game);
     console.log("inserted: ", game.homeScore + ' ' + game.awayScore + ' ' + game.date + ' ' + game.finished, game.time);
   }
 }

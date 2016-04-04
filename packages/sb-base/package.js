@@ -33,6 +33,7 @@ Package.onUse(function (api) {
   // client only files
   api.addFiles([
     'lib/namespace.js'
+    ,'lib/dateEnhancements.js'
   ], both);
 
 

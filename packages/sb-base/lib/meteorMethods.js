@@ -39,7 +39,7 @@ Meteor.methods({
 		}
 	},
 	sendInvitation: function(boardID, userID, squares, tempPassword) {
-		var board = Board.findOne(boardID);
+		var board = SB.Board.findOne(boardID);
   		var boardOwner = Meteor.user();
 		var user = Meteor.users.findOne(userID);
 		var email = user.emails != undefined ? user.emails[0].address : null;
@@ -85,7 +85,7 @@ Meteor.methods({
 		}
 	},
 	modifyBoard: function(boardID, userID, squares) {
-		var board = Board.findOne(boardID);
+		var board = SB.Board.findOne(boardID);
 		var user = Meteor.users.findOne(userID);
 
 		console.log("---- modifyBoard ----");
@@ -97,10 +97,10 @@ Meteor.methods({
 		if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
 		if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
 
-		modifySquare(board, user, squares);
+		board.modifySquare(user, squares);
 	},
 	addOwner: function(boardID, userID) {
-		var board = Board.findOne(boardID);
+		var board = SB.Board.findOne(boardID);
 		var newOwner = Meteor.users.findOne(userID);
 
 		console.log("---- addOwner ----");
@@ -149,7 +149,7 @@ Meteor.methods({
 		return boardID;
 	},
 	randomizeBoardNumbers: function(boardID) {
-		var board = Board.findOne(boardID);
+		var board = SB.Board.findOne(boardID);
 
 		console.log("---- randomizeBoardNumbers ----");
 		console.log("boardID: ", boardID);

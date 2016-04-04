@@ -4,31 +4,31 @@
 
 
 /*
-    TODO:
-    X size labels within squares  
-    X color squares 
-    X all selecting of multiple squares and assigning to an email 
-      X send an invitation email to that person 
-    X create lock board functionality
-      X assing random numbers to column on locking
-    X create layout 
-    - sort member columns
-    X display games on board 
-    - test updating board data
-    - be able to select a game from gameList or member from memberlist and highlight all effected squares
-    - enable/test realtime game updates
-    - enforce square numbers
+TODO:
+X size labels within squares  
+X color squares 
+X all selecting of multiple squares and assigning to an email 
+X send an invitation email to that person 
+X create lock board functionality
+X assing random numbers to column on locking
+X create layout 
+- sort member columns
+X display games on board 
+- test updating board data
+- be able to select a game from gameList or member from memberlist and highlight all effected squares
+- enable/test realtime game updates
+- enforce square numbers
 
-    priorities for beta:
-    X ensuring login works with usernames
-    X data entry 
-    X correct games mapping
-    - annotating games as old
-    X sortable member list
-    X recording member activity 
+priorities for beta:
+X ensuring login works with usernames
+X data entry 
+X correct games mapping
+- annotating games as old
+X sortable member list
+X recording member activity 
 
-    - chat widget
-    - realtime board updates with changing game information
+- chat widget
+- realtime board updates with changing game information
 */
 
 
@@ -40,40 +40,40 @@ Session.set('boardPageMemberListSort', {prop: 'profile.userName', order: 1});
 
 
 Template.editCheckBox.events({
-  'click #editCheckBox' : function(event){
-    //event.preventDefault();
-    var val = document.querySelector('#editCheckBox:checked');
-    console.log("editCheckBox.events(: ", val);
-    if (val) Session.set('boardPageEditMode', true);
-    else {
-      Session.set('boardPageEditMode', false);
-      Session.set('boardPageselectedSquares', []);
+    'click #editCheckBox' : function(event){
+        var val = document.querySelector('#editCheckBox:checked');
+        console.log("editCheckBox.events(: ", val);
+        if (val) Session.set('boardPageEditMode', true);
+        else {
+            Session.set('boardPageEditMode', false);
+            Session.set('boardPageselectedSquares', []);
+        }
+        console.log(Session.get('boardPageEditMode'));
     }
-    console.log(Session.get('boardPageEditMode'));
-  }
 })
+
 Template.changeRefreshCriteria.events({
-  'keypress #changeRefreshRate' : function(event, template){
-    // if enter do thing
-    if (event.which === 13) {
-      var rate = template.find("#changeRefreshRate").value
-      console.log("changeRefreshRate: ", rate);
-      Meteor.call('changeRefreshRate', rate, function(err, res) {
-        if (err) console.log(err);
-      })
+    'keypress #changeRefreshRate' : function(event, template){
+        // if enter do thing
+        if (event.which === 13) {
+            var rate = template.find("#changeRefreshRate").value
+            console.log("changeRefreshRate: ", rate);
+            Meteor.call('changeRefreshRate', rate, function(err, res) {
+                if (err) console.log(err);
+            })
+        }
+    },
+    'click #RefreshSelectedDateRangeButton' : function(event, template){
+        // if enter do thing
+        var startDate = template.find("#RefreshSelectedStartDate").value
+        var endDate = template.find("#RefreshSelectedEndDate").value
+        if (startDate && endDate) {
+            console.log("RefreshSelectedDateRange: ", startDate, endDate);
+            Meteor.call('refreshGamesBetweenDates', new Date(startDate), new Date(endDate), function(err, res) {
+                if (err) console.log(err);
+            })
+        }
     }
-  },
-  'click #RefreshSelectedDateRangeButton' : function(event, template){
-    // if enter do thing
-    var startDate = template.find("#RefreshSelectedStartDate").value
-    var endDate = template.find("#RefreshSelectedEndDate").value
-    if (startDate && endDate) {
-      console.log("RefreshSelectedDateRange: ", startDate, endDate);
-      Meteor.call('refreshGamesBetweenDates', new Date(startDate), new Date(endDate), function(err, res) {
-        if (err) console.log(err);
-      })
-    }
-  }
 })
 // Template.assignSquaresModal.events({
 //   'click #assignSelectedSquares' : function(event){
@@ -84,485 +84,473 @@ Template.changeRefreshCriteria.events({
 // })
 
 Template.editWidget.helpers({
-  boardOwner: function() {
-    return getBoard().isOwner(Meteor.user());
-  },
-  squareSize: function () {
-    return JSON.stringify(Session.get('size'));
-  },
-  selectedSquares: function () {
-    return JSON.stringify(Session.get('boardPageselectedSquares'));
-  },
-  inEditMode: function () {
-    return Session.get('boardPageEditMode')  
-           //&& Session.get('boardPageselectedSquares').length > 0;
-  }
+    boardOwner: function() {
+        return this.isOwner(Meteor.user());
+    },
+    squareSize: function () {
+        return JSON.stringify(Session.get('size'));
+    },
+    selectedSquares: function () {
+        return JSON.stringify(Session.get('boardPageselectedSquares'));
+    },
+    inEditMode: function () {
+        return Session.get('boardPageEditMode')  
+    }
 })
 
 
 Template.grid.helpers({
-  createChart: function () {
-    var board = this;
-    var winnerNumbers = board.winnerNumbers == null ? ['','','','','','','','','',''] : board.winnerNumbers;
-    var loserNumbers = board.loserNumbers == null ? ['','','','','','','','','',''] : board.loserNumbers;
+    createChart: function () {
+        var board = this;
+        var winnerNumbers = board.winnerNumbers == null ? ['','','','','','','','','',''] : board.winnerNumbers;
+        var loserNumbers = board.loserNumbers == null ? ['','','','','','','','','',''] : board.loserNumbers;
 
-    var selectedSquares = Session.get('boardPageselectedSquares');
-    var selectedGames = Session.get('boardPageselectedGames');
-    var gameMatrix = board.gamesMatrix()
-      // Use Meteor.defer() to craete chart after DOM is ready:
-      Meteor.defer(function() {
-        // Create standard Highcharts chart with options:
-        Highcharts.chart('chart1', {
-          chart: { 
-              // renderTo: 'chart1'
-              type: 'heatmap', 
-              // Edit chart spacing
-              spacingBottom: 15,
-              spacingTop: 0,
-              spacingLeft: 10,
-              spacingRight: 10,
+        var selectedSquares = Session.get('boardPageselectedSquares');
+        var selectedGames = Session.get('boardPageselectedGames');
+        var gameMatrix = board.gamesMatrix();
 
-              // Explicitly tell the width and height of a chart
-              // width: 1000,//480,
-              // height: 1000//480
-          },
-          title: { text: '' },
-          xAxis: { categories: winnerNumbers, 
-                   tickLength: 0,
-                   minorTickLength: 0,
-                   opposite: true, 
-                   title: {
-                      text: 'Winners',
-                      style: {
-                        fontWeight: "bold",
-                        fontSize: 30
-                      },
-                      // margin: 10,
-                      // offset: 2
-                   }
-                 },
-          yAxis: { categories: loserNumbers,  
-                   tickLength: 0,
-                   minorTickLength: 0,
-                   title: {
-                      text: 'Losers',
-                      style: {
-                        fontWeight: "bold",
-                        fontSize: 30
-                      }
-                   }
-                 },
-          plotOptions: {
-              series: {
-                  events: {
-                      click: function(e) {
-                        var x = e.point.x; 
-                        var y = e.point.y;
-
-                        // if in edit mode, change color of selected squares save in session
-                        if (Session.get('boardPageEditMode')) {
-                          if (squareSelected(x, y)) {
-                            selectedSquares = selectedSquares.filter(function(ele) {
-                                return !(ele.x == x && ele.y == y)
-                            });
-                          } else {
-                            selectedSquares.push({x: x, y: y});
-                          }
-                          Session.set('boardPageselectedSquares', selectedSquares);
-                        } 
-                        else {
-                          // console.log("event: ", board);
-                          Meteor.call('modifyBoard', board._id, Meteor.userId(), [{x,y}], function(err, res) {
-                            if (err) 
-                              handleServerError(err);
-                          });
-                        }
-                      }
-                  }
-              }
-          },
-          tooltip: {
-              formatter: function () {
-                var x = this.point.x;
-                var y = this.point.y;
-                var realx = this;
-                var games = gameMatrix[x][y];
-                var ret = "<b><u>Games Hit:</u></b><br>";
-                for (var i = 0; i < games.length; i++) {
-                  var game = games[i];
-                  ret +=  "(" + getGamePoints(board, game) + ")" + 
-                          game.homeTeam.name + " " + game.homeScore + " " +
-                          game.awayTeam.name + " " + game.awayScore + "<br>"
-                }
-                return ret;
-                        //gameMatrix[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
-              }
-          },
-          colorAxis: {
-              stops: [
-                  [0, '#3060cf'],
-                  [0.5, '#fffbbc'],
-                  [0.9, '#c4463a']]
-          },
-          series: [{
-              name: '',
-              title: '',
-              borderWidth: 3,
-              backgroundColor: '#303030',
-              data: board.formatData(),
-              dataLabels: {
-                formatter: function () {
-                      // only do this once per board to be uniform
-                      var square = {x: this.point.x, y: this.point.y};
-                      if (square.x==0 && square.y==0) {
-                        var size = this.point.shapeArgs.height;
-                        // console.log(this);
-                        var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
-                        Session.set('boardPageCharactersPerLine', charactersPerLine);
-                        Session.set('size', {chars:  charactersPerLine, size: size});
-                        // console.log('charperline: ', charactersPerLine);
-                      }
-                      var squareScore = board.squareTotalWinnings(square, gameMatrix);
-                      var charactersPerLine = Session.get('boardPageCharactersPerLine');
-                      var text = this.point.value;
-                      var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
-                      // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
-                      return '<div class="js-ellipse" style="" title="' 
-                              + text + '">' + formatted + '<br>' + squareScore + '</br>' + '</div>'
-                              ;
+        // Use Meteor.defer() to craete chart after DOM is ready:
+        Meteor.defer(function() {
+            Highcharts.chart('chart1', {
+                chart: { 
+                    type: 'heatmap', 
+                    spacingBottom: 15,
+                    spacingTop: 0,
+                    spacingLeft: 10,
+                    spacingRight: 10,
                 },
-                allowOverlap: false,
-                enabled: true,
-                color: '#000000',
-                crop: true,
-                borderColor: 'red',
-                borderWidth: 0,
-                padding: 0,
-                //shadow: true,
-                style: {
-                    fontWeight: 'bold'
-                }
-              },
+                title: { text: '' },
+                xAxis: { categories: winnerNumbers, 
+                    tickLength: 0,
+                    minorTickLength: 0,
+                    opposite: true, 
+                    title: {
+                        text: 'Winners',
+                        style: {
+                            fontWeight: "bold",
+                            fontSize: 30
+                        },
+                    }
+                },
+                yAxis: { categories: loserNumbers,  
+                    tickLength: 0,
+                    minorTickLength: 0,
+                    title: {
+                        text: 'Losers',
+                        style: {
+                            fontWeight: "bold",
+                            fontSize: 30
+                        }
+                    }
+                },
+                plotOptions: {
+                    series: {
+                        events: {
+                            click: function(e) {
+                                var x = e.point.x; 
+                                var y = e.point.y;
+                                // if in edit mode, change color of selected squares save in session
+                                if (Session.get('boardPageEditMode')) {
+                                    if (squareSelected(x, y)) {
+                                        selectedSquares = selectedSquares.filter(function(ele) {
+                                            return !(ele.x == x && ele.y == y)
+                                        });
+                                    } else {
+                                        selectedSquares.push({x: x, y: y});
+                                    }
+                                    Session.set('boardPageselectedSquares', selectedSquares);
+                                }
+                                else {
+                                    Meteor.call('modifyBoard', board._id, Meteor.userId(), [{x,y}], function(err, res) {
+                                        if (err) handleServerError(err);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                },
+    tooltip: {
+        formatter: function () {
+            var x = this.point.x;
+            var y = this.point.y;
+            var realx = this;
+            var games = gameMatrix[x][y];
+            var ret = "<b><u>Games Hit:</u></b><br>";
+            for (var i = 0; i < games.length; i++) {
+                var game = games[i];
+                ret +=  "(" + board.gamePoints(game) + ")" + 
+                game.homeTeam.name + " " + game.homeScore + " " +
+                game.awayTeam.name + " " + game.awayScore + "<br>"
+            }
+            return ret;
+    //gameMatrix[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
+    }
+    },
+    colorAxis: {
+        stops: [
+        [0, '#3060cf'],
+        [0.5, '#fffbbc'],
+        [0.9, '#c4463a']]
+    },
+    series: [{
+        name: '',
+        title: '',
+        borderWidth: 3,
+        backgroundColor: '#303030',
+        data: board.formatData(),
+        dataLabels: {
+            formatter: function () {
+    // only do this once per board to be uniform
+    var square = {x: this.point.x, y: this.point.y};
+    if (square.x==0 && square.y==0) {
+        var size = this.point.shapeArgs.height;
+    // console.log(this);
+    var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
+    Session.set('boardPageCharactersPerLine', charactersPerLine);
+    Session.set('size', {chars:  charactersPerLine, size: size});
+    // console.log('charperline: ', charactersPerLine);
+    }
+    var squareScore = board.squareTotalWinnings(square, gameMatrix);
+    var charactersPerLine = Session.get('boardPageCharactersPerLine');
+    var text = this.point.value;
+    var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
+    // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
+    return '<div class="js-ellipse" style="" title="' 
+    + text + '">' + formatted + '<br>' + squareScore + '</br>' + '</div>'
+    ;
+    },
+    allowOverlap: false,
+    enabled: true,
+    color: '#000000',
+    crop: true,
+    borderColor: 'red',
+    borderWidth: 0,
+    padding: 0,
+    //shadow: true,
+    style: {
+        fontWeight: 'bold'
+    }
+    },
     //          tooltip: {
     //              headerFormat: '<b>Games hit</b> <br/>',
     //              pointFormat: 'uconn 52 delaware 43 rnd 1 <br/> miami 52 Michigan 43 rnd 2 <br/>'
     //          }
-          }],
-          legend: {
-            enabled: false
-          },            
-      })
+    }],
+    legend: {
+        enabled: false
+    },            
+    })
     });
-  }
-})
+    }
+});
 
 Template.lockBoardButton.events({
-  'click #lockBoardButton': function(event) {
-    if (window.confirm('cannot undo')) {
-      Meteor.call('randomizeBoardNumbers', this._id, function(err, res) {
-        if (err) console.log(err);
-      })
+    'click #lockBoardButton': function(event) {
+        if (window.confirm('cannot undo')) {
+            Meteor.call('randomizeBoardNumbers', this._id, function(err, res) {
+                if (err) console.log(err);
+            })
+        }
     }
-  }
 });
 
 Template.invitePlayersModal.events({
-  'click #invitePlayersButton' : function(event){
-    //event.preventDefault();
-    if($('#invitePlayersButton').hasClass('disabled')) return;
-    console.log("click #invitePlayersButton: ", this);
-    Modal.show('invitePlayersModal', this);
-  },
-  'submit #invitePlayerForm' : function(event) {
+    'click #invitePlayersButton' : function(event){
+//event.preventDefault();
+if($('#invitePlayersButton').hasClass('disabled')) return;
+console.log("click #invitePlayersButton: ", this);
+Modal.show('invitePlayersModal', this);
+},
+'submit #invitePlayerForm' : function(event) {
     event.preventDefault();
     var squares = Session.get('boardPageselectedSquares');
     var email = event.target.email.value == '' ? null : event.target.email.value;
     var userName = event.target.userName.value;
-    var board = getBoard();
+    var board = this;
     var boardID = board._id;
     var userID;
     console.log("submit #invitePlayerForm  this: ", this, userName, email);
 
-    // if email address is attached to user and user already a member, error
-    var existingUser = Meteor.users.findOne({$and: [
-      {'emails.address': {$in: [null]}}, 
-      {'emails.address': {$exists: true}}
-      ]})
-    if (existingUser && board.boardMember(existingUser)) {
-      console.log("existingUser: ", existingUser);
-      throw new Meteor.Error("User already on board, try re-assigning squares");
-    }
+// if email address is attached to user and user already a member, error
+var existingUser = Meteor.users.findOne({$and: [
+    {'emails.address': {$in: [null]}}, 
+    {'emails.address': {$exists: true}}
+    ]})
+if (existingUser && board.boardMember(existingUser)) {
+    console.log("existingUser: ", existingUser);
+    throw new Meteor.Error("User already on board, try re-assigning squares");
+}
 
-    // create user if doesn't exist
-    if (!existingUser) {
-      console.log("inserting new user",  boardID, email, userName, squares);
-      Meteor.call('createUserAndInvitation', boardID, email, userName, squares, 
+// create user if doesn't exist
+if (!existingUser) {
+    console.log("inserting new user",  boardID, email, userName, squares);
+    Meteor.call('createUserAndInvitation', boardID, email, userName, squares, 
         function(err, res) {
-          console.log("createUser callback: ", err, res);
+            console.log("createUser callback: ", err, res);
             if (err)
-              handleServerError(err);
+                handleServerError(err);
             userID = res
-      })
-    }
-    else {
-      console.log("found existing user: ", existingUser);
-      userID = existingUser._id;
-      Meteor.call('sendInvitation', boardID, userID, squares, 
+        })
+}
+else {
+    console.log("found existing user: ", existingUser);
+    userID = existingUser._id;
+    Meteor.call('sendInvitation', boardID, userID, squares, 
         function(err, res) {
-          if (err)
-            handleServerError(err);
-      });
-    }
+            if (err)
+                handleServerError(err);
+        });
+}
 
-    Session.set('boardPageselectedSquares', []);
-    Modal.hide('invitePlayersModal');
-  }
+Session.set('boardPageselectedSquares', []);
+Modal.hide('invitePlayersModal');
+}
 });
 
 
 Template.assignSquaresModal.events({
-  'click #assignSelectedSquares' : function(event){
-    //event.preventDefault();
-    if($('#assignSelectedSquares').hasClass('disabled')) return;
-    console.log("click #assignSelectedSquares: ", this);
-    Modal.show('assignSquaresModal', this);
-  },
-  'submit #assignSquareForm' : function(event) {
+    'click #assignSelectedSquares' : function(event){
+//event.preventDefault();
+if($('#assignSelectedSquares').hasClass('disabled')) return;
+console.log("click #assignSelectedSquares: ", this);
+Modal.show('assignSquaresModal', this);
+},
+'submit #assignSquareForm' : function(event) {
     event.preventDefault();
     var squares = Session.get('boardPageselectedSquares');
     var userID = $(event.target.members).find(':selected').data("id");
 
     try {
-      Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
-        if (err)
-          handleServerError(err);
-      });
+        Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
+            if (err)
+                handleServerError(err);
+        });
     } catch (e) {}
     Session.set('boardPageselectedSquares', []);
     Modal.hide('assignSquaresModal');
-  }
+}
 });
 
 
 Template.changeBoardOwnershipModal.events({
-  'click #changeBoardOwnershipButton' : function(event){
-    //event.preventDefault();
-    Modal.show('changeBoardOwnershipModal', this);
-  },
-  'submit #addBoardOwnerForm' : function(event) {
+    'click #changeBoardOwnershipButton' : function(event){
+//event.preventDefault();
+Modal.show('changeBoardOwnershipModal', this);
+},
+'submit #addBoardOwnerForm' : function(event) {
     event.preventDefault();
     var userID = $(event.target.members).find(':selected').data("id");
 
     Meteor.call('addOwner', this._id, userID, function(err, res) {
-      if (err)
-        handleServerError(err);
+        if (err)
+            handleServerError(err);
     });
 
     Modal.hide('changeBoardOwnershipModal');
-  }
+}
 });
 
 
 Template.boardMemeberSelector.helpers({
-  boardMembers : function() {
-    return this.getUsers();
-  }
+    boardMembers : function() {
+        return this.getUsers();
+    }
 })
 
 
 Template.gameList.events({
-  "click .gameItems": function(event) {
-    var selectedGame = $(event.currentTarget).attr("data-id");
-    var games = Session.get('boardPageselectedGames');
+    "click .gameItems": function(event) {
+        var selectedGame = $(event.currentTarget).attr("data-id");
+        var games = Session.get('boardPageselectedGames');
 
-    if (!gameIsSelected(selectedGame)) 
-      games.push(selectedGame);                       // add
-    else
-      games.splice(games.indexOf(selectedGame), 1);   // remove
+        if (!gameIsSelected(selectedGame)) 
+games.push(selectedGame);                       // add
+else
+games.splice(games.indexOf(selectedGame), 1);   // remove
 
-    console.log("click .gameItems", games);
-    Session.set('boardPageselectedGames', games);
-  }
+console.log("click .gameItems", games);
+Session.set('boardPageselectedGames', games);
+}
 });
 
 Template.gameList.helpers({
-  games : function() {
-    var games = getGames(mostRecentWeeksQuery(), {finished: 1});
-    return games;
-  }
+    games : function() {
+        var games = SB.Game.getGames(SB.Game.query.function.mostRecentWeeks(), {finished: 1});
+        return games;
+    }
 });
 Template.gameItem.helpers({
-  backgroundColor : function(){
-    var games = Session.get('boardPageselectedGames');
-    if (games.indexOf(this._id) != -1) {
-      return "blue";
+    backgroundColor : function(){
+        var games = Session.get('boardPageselectedGames');
+        if (games.indexOf(this._id) != -1) {
+            return "blue";
+        }
+        return "white";
     }
-    return "white";
-  }
 })
 Template.gameTimeView.helpers({
-  gameStarted : function() {
-    var started = (this.time.period != 0);
-    return started;
-  },
-  getClock : function() {
-    var min = Math.floor(this.time.secLeft/60);
-    var sec = (this.time.secLeft % 60).format2DigitString();
-    return min + ":" + sec;
-  },
-  getPeriod : function() {
-    switch(this.time.period) {
-      case 0:
-        return;
-      case 1:
-        return '1st';
-      case 2:
-        return '2nd'; 
-      case 3:
-        return '3rd';
-      case 4:
-        return '4th';   
-      default: 
-        throw new Meteor.Error("invalid value for period '" + this.time.period + "'"); 
+    gameStarted : function() {
+        var started = (this.time.period != 0);
+        return started;
+    },
+    getClock : function() {
+        var min = Math.floor(this.time.secLeft/60);
+        var sec = (this.time.secLeft % 60).format2DigitString();
+        return min + ":" + sec;
+    },
+    getPeriod : function() {
+        switch(this.time.period) {
+            case 0:
+            return;
+            case 1:
+            return '1st';
+            case 2:
+            return '2nd'; 
+            case 3:
+            return '3rd';
+            case 4:
+            return '4th';   
+            default: 
+            throw new Meteor.Error("invalid value for period '" + this.time.period + "'"); 
+        }
+    },
+    getStartTime : function() {
+        var date = (this.date.getMonth()+1) + '/' + this.date.getDate();
+        var time = this.date.getHours() + ':' + this.date.getMinutes();
+        return date + ' ' + time;
+    },
+    gameFinished : function() {
+        return this.finished;
     }
-  },
-  getStartTime : function() {
-    var date = (this.date.getMonth()+1) + '/' + this.date.getDate();
-    var time = this.date.getHours() + ':' + this.date.getMinutes();
-    return date + ' ' + time;
-  },
-  gameFinished : function() {
-    return this.finished;
-  }
 })
 
 Template.memberList.helpers({
-  members : function() {
-    var memberIDs = this.members.map(function(m) {return m._id});
-    var sortData = Session.get('boardPageMemberListSort');
-    var sortObj = {sort: {'status.online': -1}};
-    sortObj.sort[sortData.prop] = sortData.order;
+    members : function() {
+        var memberIDs = this.members.map(function(m) {return m._id});
+        var sortData = Session.get('boardPageMemberListSort');
+        var sortObj = {sort: {'status.online': -1}};
+        sortObj.sort[sortData.prop] = sortData.order;
 
-    // console.log("memberList: ", sortObj);
-    var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
-    // console.log("members: ", members.fetch());
+// console.log("memberList: ", sortObj);
+var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
+// console.log("members: ", members.fetch());
 
-    // console.log("members: ", memberIDs, members);
-    return members;
-  },
-  header : function() {
+// console.log("members: ", memberIDs, members);
+return members;
+},
+header : function() {
     return {
-      name: "member",
-      numSquares: "#",
-      winnings: "$",
-      paid: "paid"
+        name: "member",
+        numSquares: "#",
+        winnings: "$",
+        paid: "paid"
     }
-  }
+}
 });
 Template.memberItem.helpers({
-  name: function() {
-    if (this == "header") return "member";
-    return this.profile.userName;
-  },
-  numSquares: function(board) {
-    if (this == "header") return "#";
-    return board.memberNumSquares(this);    
-  },
-  winnings: function(board) {
-    if (this == "header") return "$";
-    var games = getGames([{finished: true}]);
-    var winnings = board.memberWinnings(games, this);
-    return winnings;
-  },
-  paid: function(board) {
-    if (this == "header") return "paid";
-    var ret = board.memberPaid(this);
-    return ret == true ? 'Y' : 'N'
-  },
-  headerClass: function() {
-    if (this == "header") return "memberListHeader";
-    return "";
-  },
-  nameClass: function() {
-    if (this == "header") return "memberListHeaderName";
-    var classes = "memberListName";
-    if (this.status && this.status.online) {
-      classes += " memberOnline"
+    name: function() {
+        if (this == "header") return "member";
+        return this.profile.userName;
+    },
+    numSquares: function(board) {
+        if (this == "header") return "#";
+        return board.memberNumSquares(this);    
+    },
+    winnings: function(board) {
+        if (this == "header") return "$";
+        var games = SB.Game.getGames([{finished: true}]);
+        var winnings = board.memberWinnings(games, this);
+        return winnings;
+    },
+    paid: function(board) {
+        if (this == "header") return "paid";
+        var ret = board.memberPaid(this);
+        return ret == true ? 'Y' : 'N'
+    },
+    headerClass: function() {
+        if (this == "header") return "memberListHeader";
+        return "";
+    },
+    nameClass: function() {
+        if (this == "header") return "memberListHeaderName";
+        var classes = "memberListName";
+        if (this.status && this.status.online) {
+            classes += " memberOnline"
+        }
+        return classes;
+    },
+    numSquaresClass: function() {
+        if (this == "header") return "memberListHeaderNumSquares";
+        return "memberListNumSquares";
+    },
+    winningsClass: function() {
+        if (this == "header") return "memberListHeaderWinnings";
+        return "memberListWinnings";
+    },
+    paidClass: function() {
+        if (this == "header") return "memberListHeaderPaid";
+        return "memberListPaid";
     }
-    return classes;
-  },
-  numSquaresClass: function() {
-    if (this == "header") return "memberListHeaderNumSquares";
-    return "memberListNumSquares";
-  },
-  winningsClass: function() {
-    if (this == "header") return "memberListHeaderWinnings";
-    return "memberListWinnings";
-  },
-  paidClass: function() {
-    if (this == "header") return "memberListHeaderPaid";
-    return "memberListPaid";
-  }
 });
 Template.memberItem.events({
-  // for any of the header clicks, sort by that row
-  "click .memberListHeaderName": function(event) {
+// for any of the header clicks, sort by that row
+"click .memberListHeaderName": function(event) {
     var currSort = Session.get('boardPageMemberListSort');
     var currOrder = currSort.order;
     var newSort;
     var newProp = 'profile.userName';
 
-    // if sorting same property, inverse the sort
-    if (currSort.prop == newProp) {
-      var newOrder = currOrder==1 ? -1 : 1
-      newSort = {prop: newProp, order: newOrder};
-    }
-    else 
-      newSort = {prop: newProp, order: 1}
+// if sorting same property, inverse the sort
+if (currSort.prop == newProp) {
+    var newOrder = currOrder==1 ? -1 : 1
+    newSort = {prop: newProp, order: newOrder};
+}
+else 
+    newSort = {prop: newProp, order: 1}
 
-    Session.set('boardPageMemberListSort', newSort);
-    console.log("click .memberListHeaderName", newSort);
-  },
-  "click .memberListHeaderNumSquares": function(event) {
+Session.set('boardPageMemberListSort', newSort);
+console.log("click .memberListHeaderName", newSort);
+},
+"click .memberListHeaderNumSquares": function(event) {
     var currSort = Session.get('boardPageMemberListSort');
     var currOrder = currSort.order;
     var newSort;
     var newProp = 'profile.userName';
 
-    // if sorting same property, inverse the sort
-    if (currSort.prop == newProp) {
-      var newOrder = currOrder==1 ? -1 : 1
-      newSort = {prop: newProp, order: newOrder};
-    }
-    else 
-      newSort = {prop: newProp, order: 1}
+// if sorting same property, inverse the sort
+if (currSort.prop == newProp) {
+    var newOrder = currOrder==1 ? -1 : 1
+    newSort = {prop: newProp, order: newOrder};
+}
+else 
+    newSort = {prop: newProp, order: 1}
 
-    // Session.set('boardPageMemberListSort', newSort);
-    console.log("click .memberListHeaderName", newSort);
-  },
+// Session.set('boardPageMemberListSort', newSort);
+console.log("click .memberListHeaderName", newSort);
+},
 });
 
 
 
 Template.registerHelper('boardPageEditButtonDisabled', 
-  function(){
-    if (Session.get('boardPageEditMode') ) {
-        //&& Session.get('boardPageselectedSquares').length > 0)
-      return "";
-    }
-    else 
-      return "disabled";
-  }
+    function(){
+        if (Session.get('boardPageEditMode') ) {
+//&& Session.get('boardPageselectedSquares').length > 0)
+return "";
+}
+else 
+    return "disabled";
+}
 );
 
 
 handleServerError = function handleServerError(err) {
-  console.log(err);
-  alert(err);
+    console.log(err);
+    alert(err);
 }
 
 Template.registerHelper('printThis',
-  function(name) {
-    console.log("printThis (" + name + "): " , this);
-})
+    function(name) {
+        console.log("printThis (" + name + "): " , this);
+    })
 

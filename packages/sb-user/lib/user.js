@@ -10,7 +10,7 @@ UserModel = function(doc) {
 // instance methods
 _.extend(UserModel.prototype, {
   boards : function boards() {
-    var boardIDs = this.profile.boardIDs;
+    var boardIDs = this.profile.boardIDs; boardObjects = [];
     for (var i = 0; i < boardIDs.length; i++) {
       var board = SB.Board.findOne(boardIDs[i])
       boardObjects.push(board);
@@ -19,6 +19,8 @@ _.extend(UserModel.prototype, {
   }
 });
 
+_.extend(Meteor.users, {
+});
 
 
 var userProfileSchema = new SimpleSchema({

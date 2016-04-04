@@ -9,7 +9,7 @@ Router.route('/board/:_id', {
   },
   data: function () {
     var id = this.params._id
-    var board = Board.findOne(id);
+    var board = SB.Board.findOne(id);
     if (board)
       Meteor.subscribe('userData',board.members.map(function(m){ return m._id }))
 

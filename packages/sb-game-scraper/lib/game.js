@@ -1,7 +1,34 @@
-// need a way to tie the values of a game (round) to values of a board (score/round)
-// https://github.com/aldeed/meteor-autoform/issues/924  conditionally hide fields in schema from autoform
+SB.namespacer('SB', {Game: 
+	new Mongo.Collection('games', {
+		transform: function (doc) { 
+			return new GameModel(doc);
+		}
+  })
+});
 
-Game = new Mongo.Collection('games');
+
+GameModel = function(doc) {
+	_.extend(this, doc);
+};
+
+// instance methods
+_.extend(GameModel.prototype, {
+});
+
+// static methods
+_.extend(SB.Game, {
+	getGames : function getGames(query, sort) {
+		var baseQuery = [{date: {$gte: new Date(2016,01,01)}}];
+		if (!sort) sort = {};
+		if (!query) query = [];
+		var parms = query.concat(baseQuery);
+		var ret = this.find({$and: parms}, {sort: sort}).fetch();
+		// console.log('getGames: ', JSON.stringify(parms), sort, ret.length);
+		return ret;
+	}
+});
+
+
 
 
 var TeamSchema = new SimpleSchema({
@@ -99,5 +126,4 @@ var GameSchema = new SimpleSchema({
 	}
 });
 
-Game.attachSchema(GameSchema);
-
+SB.Game.attachSchema(GameSchema);

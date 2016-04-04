@@ -27,9 +27,10 @@ Package.onUse(function (api) {
 
   // client only files
   api.addFiles([
-  	'client/browser/BoardPage/helper.js'  	
-  	,'client/browser/BoardPage/style.css'
-  	,'client/browser/BoardPage/helper.html'
+    'client/browser/sessionMethods.js'
+    ,'client/browser/BoardPage/helper.html'
+    ,'client/browser/BoardPage/style.css'
+  	,'client/browser/BoardPage/helper.js'  	
   	,'client/browser/BoardPage/layout.html'
   	,'client/browser/BoardPage/route.js'  	
   ], client);
