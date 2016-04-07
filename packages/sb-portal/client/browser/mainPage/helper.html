@@ -9,7 +9,7 @@
 
 <template name="userBoardsList">
 	{{#if loggedIn}}
-		<ul clas="list-group">
+		<ul clas="list-group sbPortalBoardList">
 		{{#each boards}}
 			{{> userBoard}}
 		{{/each}}
@@ -18,7 +18,7 @@
 </template>
 
 <template name="userBoard">
-	<li class="list-group-item">
+	<li class="list-group-item sbPortalBoard">
 		<a href="{{boardLink}}">{{boardName}}</a>
 	</li>
 </template>

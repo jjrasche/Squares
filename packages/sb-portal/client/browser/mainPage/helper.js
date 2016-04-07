@@ -32,7 +32,7 @@ Template.createBoardModal.events({
     var boardName = event.target.boardName.value;
     var boardType = $(event.target.boardType).find(':selected').data("id");
 
-	Meteor.call('createBoard', boardName, function(err, res) {
+	Meteor.call('createBoard', boardName, Meteor.userId(), function(err, res) {
 		if (err) handleServerError(err);
 		Router.go("/board/"+res);
 	})

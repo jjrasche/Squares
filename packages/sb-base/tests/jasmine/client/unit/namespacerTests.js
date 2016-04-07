@@ -1,4 +1,4 @@
-describe("app feature", function(){
+describe("namespace", function(){
   // console.log('testing', SB);
   it("Add simple variable to namespace", function(done) {
     SB.namespacer('SB', {test: 5})

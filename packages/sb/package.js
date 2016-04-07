@@ -1,3 +1,7 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   summary: "Package organizing dependencies for Sport Betting App.",
   version: "0.0.1",
@@ -6,21 +10,15 @@ Package.describe({
 
 
 Package.onUse(function (api) {
-  //api.versionsFrom('1.3.0');
-
   api.imply([
     'jjrasche:sb-base'
     ,'jjrasche:sb-game-scraper'        
     ,'jjrasche:sb-squares-board'    
     ,'jjrasche:sb-user'    
     ,'jjrasche:sb-portal'
-  ], ['client', 'server']);
+  ], both);
 
 
-  // api.use('underscore', 'server');
-  // api.use('iron:router@1.0.0');
-  // api.imply('templating')
-  // api.addFiles('email.js', 'server');
   api.export('SB');
 });
 
@@ -33,12 +31,12 @@ Npm.depends({
 
 /*
   mongorestore -h 127.0.0.1 --port 3001 -d meteor dump/meteor
-  velocity test-packages jjrasche:sb-base --port 3002
+  IS_MIRROR=1 velocity test-packages jjrasche:sb-base --port 3002
+    * IS_MIRROR=1 is necessary as this var is not set by velocity anymore
 
   Model layout
   <AppName>.<Object>.model                  SB.Board.model.findOne(...)
   <AppName>.<Object>.<action>               SB.Board.modify
   <AppName>.<Object>.validate.<action>      
   
-
 */

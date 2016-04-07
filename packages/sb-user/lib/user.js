@@ -59,7 +59,8 @@ var userProfileSchema = new SimpleSchema({
   },
   boardIDs : {
     type: [String],
-  }
+  }, 
+  online: { type: Boolean, optional: true, blackbox: true }
 });
 
 

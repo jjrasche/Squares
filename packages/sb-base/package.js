@@ -1,3 +1,7 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   summary: "Base app for colleections and project wide dependencies.",
   version: "0.0.1",
@@ -6,39 +10,39 @@ Package.describe({
 
 
 Package.onUse(function (api) {
-  var client = ['client'];
-  var both = ['client', 'server'];
   // server and client dependencies
-  var dep = [
+  var packages = [
     'meteor-base'
     ,'jquery'
     ,'templating'
     ,'iron:router@1.0.12'
     ,'mobile-experience'
     ,'mongo'
-    ,'accounts-base'
-    ,'accounts-password'
     ,'email'
     ,'random'
     // ,'meteorhacks:ssr'
     ,'aldeed:collection2'
     ,'aldeed:autoform'
     ,'autopublish'
-    ,'mizzao:user-status'
     ,'check'
   ];
-  api.imply(dep, both);
-  api.use(dep, both);
-
-  // client only files
+  api.use(packages, both);
+  api.imply(packages, both);
+  // server and client files
   api.addFiles([
     'lib/namespace.js'
     ,'lib/dateEnhancements.js'
   ], both);
 
 
+  // server only files
+  api.addFiles([
+    'server/mailSettings.js'
+  ],'server');
+
+
   // client only dependencies
-  dep = [
+  packages = [
     'tracker'
     ,'blaze-html-templates'
     ,'session'
@@ -54,9 +58,8 @@ Package.onUse(function (api) {
     ,'sacha:spin'
     ,'afruth:chapp'
   ]
-  api.imply(dep, client);
-  api.use(dep, client);
-
+  api.use(packages, client);
+  api.imply(packages, client);
 
   // client only files
   api.addFiles([
@@ -73,24 +76,9 @@ Package.onUse(function (api) {
 Package.onTest(function (api) {  
   api.use(['jjrasche:sb-base'
     , 'sanjo:jasmine@0.20.3'
-    //,'velocity:core'
-    // ,'velocity:console-reporter'
-    //,'sanjo:jasmine'
-    // ,'xolvio:cucumber'
   ]);
-  api.imply(['jjrasche:sb-base'
-    , 'sanjo:jasmine@0.20.3'
-    //,'velocity:core'
-    // ,'velocity:console-reporter'
-    //,'sanjo:jasmine'
-    // ,'xolvio:cucumber'
-  ]);
-
-  // console.log('Package.onTest: ',SB);
 
   api.addFiles('tests/jasmine/client/unit/namespacerTests.js', 'client');
-
-  //api.export('SB');
 });
 
 Npm.depends({

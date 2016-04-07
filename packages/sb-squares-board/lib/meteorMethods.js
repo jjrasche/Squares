@@ -117,34 +117,33 @@ Meteor.methods({
 			return;
 
 		board.owners.push(newOwner._id);
-		Board.update({_id: board._id}, {$set: {owners: board.owners}});
+		SB.Board.update({_id: board._id}, {$set: {owners: board.owners}});
 		
 	},
-	createBoard: function(boardName) {
-		var user = Meteor.user();
-		var board = Board.initializeBoard();
+	createBoard: function(boardName, userID) {
+		var user = Meteor.users.findOne(userID);
 
 		console.log("---- createBoard ----");
 		console.log("boardName: ", boardName);
-		console.log("userID: ", user);
+		console.log("userID: ", userID);
 
-		if (!Meteor.user())	throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
+		if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
 
-
-		board.owners = [user._id];
+		board = {};
+		board.owners = [userID];
 		board.name = boardName;
 		board.members = [{
-			_id: user._id,
+			_id: userID,
 			numSquares: 0,
 			paid: false
 		}];
 		board.locked = false;
-		var boardID = Board.insert(board);
+		var boardID = SB.Board.insert(board);
 
 		// add board to user's boardIDs
-		var boardIDs = Meteor.user().profile.boardIDs; 
+		var boardIDs = user.profile.boardIDs; 
 		boardIDs.push(boardID);
-		Meteor.users.update(Meteor.userId(), {$set: {'profile.boardIDs': boardIDs}});
+		Meteor.users.update(user._id, {$set: {'profile.boardIDs': boardIDs}});
 
 		return boardID;
 	},
@@ -159,7 +158,7 @@ Meteor.methods({
 		if (!board.isOwner(Meteor.user())) throw new Meteor.Error("Only owners can add an owner.");
 
 		if (!board.locked) {
-			Board.update({_id: boardID},{$set: {
+			SB.Board.update({_id: boardID},{$set: {
 					winnerNumbers: shuffle([0,1,2,3,4,5,6,7,8,9]),
 					loserNumbers: shuffle([0,1,2,3,4,5,6,7,8,9]),	
 					locked: true			
@@ -167,7 +166,7 @@ Meteor.methods({
 			});
 		}
 		else {
-			Board.update({_id: boardID},{$set: {
+			SB.Board.update({_id: boardID},{$set: {
 					winnerNumbers: null,
 					loserNumbers: null,	
 					locked: false			
