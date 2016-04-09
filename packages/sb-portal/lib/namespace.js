@@ -1,0 +1,1 @@
+SB.namespacer('SB.Portal' {viewableBoardsLimit : 5});

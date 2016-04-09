@@ -1,12 +1,10 @@
 SB.namespacer('SB.User.fixture', {formObject : 
-	function formObject(email, userName, password) {
+	function formObject(args) {
 		return {
-				email: email, 
-				username: userName,
-				profile: {
-					userName: userName
-				},
-				password: password
+				email: args.email, 
+				username: args.username,
+				profile: {},
+				password: args.password
 		}
 	}
 });

@@ -1,14 +1,14 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   summary: "templates, logic, and routes for scraping game data.",
   version: "0.0.1",
   name: "jjrasche:sb-squares-board",
 });
 
-
 Package.onUse(function (api) {
-  var client = ['client'];
-  var both = ['client', 'server'];
-
   // server and client dependencies
   api.use([
     'jjrasche:sb-base'
@@ -28,7 +28,6 @@ Package.onUse(function (api) {
   api.use([
   ], client);
 
-
   // client only files
   api.addFiles([
     'client/browser/sessionMethods.js'
@@ -43,7 +42,7 @@ Package.onUse(function (api) {
 Package.onTest(function (api) {
   api.use(['jjrasche:sb-squares-board'
     , 'sanjo:jasmine@0.20.3'
-    // ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
+    ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
 });
 

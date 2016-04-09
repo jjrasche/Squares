@@ -36,6 +36,15 @@ Npm.depends({
   Model layout
   <AppName>.<Object>.model                  SB.Board.model.findOne(...)
   <AppName>.<Object>.<action>               SB.Board.modify
-  <AppName>.<Object>.validate.<action>      
+  <AppName>.<Object>.validate.<action>    
+
+
+  <collection>.find(selector, [options]) for transform to be used the order of 
+  options must be transform --> sort. And not the other way around.  
   
+
+  pub/sub model
+  - templates are responsible for subscribing to needed data
+  - attempt: make page level subscriptions in layout templates
+  - use publish-composite to group all information needed by a single page
 */

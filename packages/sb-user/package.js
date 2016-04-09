@@ -42,6 +42,7 @@ Package.onUse(function (api) {
 
   // client only files
   api.addFiles([
+    'client/config.accounts.js'
   ], client);
 });
 
@@ -51,10 +52,11 @@ Package.onTest(function (api) {
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
 
-  // api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', 'client');
-  // api.addFiles('tests/jasmine/client/unit/fixtureTest.js', 'client');
-  api.addFiles('tests/jasmine/client/unit/modelTest.js', 'client');
-  api.export('SB');
+  // api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
+  // api.addFiles('tests/jasmine/client/unit/fixtureTest.js', client);
+  api.addFiles('tests/jasmine/client/unit/modelTest.js', client);
+  api.addFiles('tests/jasmine/server/unit/modelTest.js', server);
+  api.export(['SB', 'Meteor']);
 });
 
 

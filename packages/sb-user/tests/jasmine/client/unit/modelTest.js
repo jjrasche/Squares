@@ -1,23 +1,15 @@
-describe("test functionality related to User model", function() {
+describe("User model functionality Client", function() {
   Meteor.call('resetTestingEnvironment');
-  var baseUser = SB.User.findOne();
-  if (!baseUser) throw Meteor.Error('no users');
 
-  it("getUser baseline", function(done) {
-    var sbUser = SB.User.getUser({username: baseUser.username});
-    expect(baseUser._id).toEqual(sbUser._id);
-    done();
-  });
+  it("SB.User.user works on client", function(done) {
+    expect(SB.User.user()).toBeUndefined();
 
-  it("getUser transform works", function(done) {
-    var sbUser = SB.User.getUser({username: baseUser.username});
-    expect(sbUser.boards).toBeDefined();
-    done();
+    var user = SB.fixture.tester;
+    Meteor.loginWithPassword(user.email, user.password, function(err){
+      expect(SB.User.user()).toBeDefined();
+      done();
+    });
   });
 
 });
 
-/*
-  velocity reporter does not display when process.env.IS_MIRROR == true
-
-*/

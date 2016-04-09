@@ -1,55 +1,59 @@
 SB.namespacer('SB.User', {user :
   function user() {
-    return new UserModel(Meteor.user());
+    var user = Meteor.isClient ? Meteor.user() : this.user();
+    if (user) return new SB.User.model(user);
+  }
+});
+
+SB.namespacer('SB.User', {ID :
+  function ID() {
+    return Meteor.userId();
   }
 });
 
 SB.namespacer('SB.User', {findOne :
   // expects array of selector statements, sort object
   function findOne(selector, sort) {
-    var selectObj = {}; sortObj = {sort: {}};
+    var selectObj = {}; sortObj = {};
     if (selector !== undefined && Object.keys(selector).length)
       selectObj = selector;
     if (sort !== undefined && Object.keys(sort).length)
-      sortObj.sort = sort;
+      sortObj = sort;
 
-    console.log('selectObj: ', selectObj, selector, (selector !== undefined && Object.keys(selector).length));
-    console.log('sortObj: ', sortObj, sort, (sort !== undefined && Object.keys(sort).length));
-    return Meteor.users.findOne(selectObj, sortObj,
-                                {transform: 
-                                  function(doc) {
-                                    return new UserModel(doc);
+    return Meteor.users.findOne(selectObj,
+                                { sort: sortObj, 
+                                  transform: function(doc) {
+                                    return new SB.User.model(doc);
                                   }
-                              });
+                                });
   }
 });
 
 SB.namespacer('SB.User', {find :
   function find(selector, sort) {
-    var selectObj = {}; sortObj = {sort: {}};
+    var selectObj = {}; sortObj = {};
     if (selector !== undefined && Object.keys(selector).length)
       selectObj = selector;
     if (sort !== undefined && Object.keys(sort).length)
-      sortObj.sort = sort;
+      sortObj = sort;
 
-    console.log('selectObj: ', selectObj, selector, (selector !== undefined && Object.keys(selector).length));
-    console.log('sortObj: ', sortObj, sort, (sort !== undefined && Object.keys(sort).length));
-    return Meteor.users.find(selectObj, sortObj,
-                                {transform: 
-                                  function(doc) {
-                                    return new UserModel(doc);
-                                  }
+    return Meteor.users.find(selectObj,
+                              { sort: sortObj, 
+                                transform: function(doc) {
+                                  return new SB.User.model(doc);
+                                }
                               });
   }
 });
 
-
-UserModel = function(doc) {
-  _.extend(this, doc);
-};
+SB.namespacer('SB.User', {model :
+  function(doc) {
+    _.extend(this, doc);
+  }
+});
 
 // instance methods
-_.extend(UserModel.prototype, {
+_.extend(SB.User.model.prototype, {
   boards : function boards() {
     var boardIDs = this.profile.boardIDs; boardObjects = [];
     for (var i = 0; i < boardIDs.length; i++) {
@@ -60,14 +64,13 @@ _.extend(UserModel.prototype, {
   }
 });
 
-_.extend(Meteor.users, {
-});
+
 
 
 var userProfileSchema = new SimpleSchema({
-  userName: {
-      type: String,
-  },
+  // userName: {
+  //     type: String,
+  // },
   firstName: {
       type: String,
       optional: true

@@ -161,7 +161,7 @@ Template.grid.helpers({
                                     Session.set('boardPageselectedSquares', selectedSquares);
                                 }
                                 else {
-                                    Meteor.call('modifyBoard', board._id, Meteor.userId(), [{x,y}], function(err, res) {
+                                    Meteor.call('modifyBoard', board._id, SB.User.ID(), [{x,y}], function(err, res) {
                                         if (err) handleServerError(err);
                                     });
                                 }

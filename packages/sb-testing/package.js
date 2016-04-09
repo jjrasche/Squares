@@ -16,9 +16,13 @@ Package.onUse(function (api) {
   ], both);
 
   api.addFiles([
+    'namespace.js'
+  ], both);
+
+  api.addFiles([
     'fixtureMethod.js'
     , 'baseFixtures.js'
-    ], 'server');
+  ], server);
 });
 
 Package.onTest(function (api) {

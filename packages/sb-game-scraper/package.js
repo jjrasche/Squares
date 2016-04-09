@@ -1,14 +1,14 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   summary: "templates, logic, and routes for using the Squares game",
   version: "0.0.1",
   name: "jjrasche:sb-game-scraper",
 });
 
-
 Package.onUse(function (api) {
-  var client = ['client'];
-  var both = ['client', 'server'];
-
   // server and client dependencies
   api.use([
     'jjrasche:sb-base'

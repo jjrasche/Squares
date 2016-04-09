@@ -5,14 +5,8 @@ describe("portal page interaction tests", function() {
 
   beforeEach(function (done) {
     Meteor.loginWithPassword(email, password, function(err){
-      Router.go('portal');
+      Router.go('sbPortalMainPage');
       Tracker.afterFlush(done);
-    });
-  });
-  beforeEach(function (done) {
-    Router.go('portal');
-    Tracker.afterFlush(function(){
-      done();
     });
   });
   beforeEach(waitForRouter);

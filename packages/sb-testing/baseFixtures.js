@@ -2,12 +2,12 @@ initializeFixutres = function initializeFixutres() {
 	var tester; tester2; board;
 	// create users
 	if (!SB.User.find().count()) {	
-		tester = SB.User.fixture.formObject('test@test.com', 'tester', 'tttttt')
+		tester = SB.User.fixture.formObject(SB.fixture.tester);
 		Accounts.createUser(tester);
 		tester = SB.User.findOne();
 		if (SB.debug) console.log(tester);
 
-		tester2 = SB.User.fixture.formObject('test2@test.com', 'tester2', 'tttttt')
+		tester2 = SB.User.fixture.formObject(SB.fixture.tester2);
 		Accounts.createUser(tester2);
 		if (SB.debug) console.log(tester2);
 	}

@@ -1,9 +1,6 @@
 Router.route('/', {
-  name: 'portal',
-  // waitOn: function() {
-  //   return Meteor.subscribe('getUserBoards', this.params._id);
-  // },
+  name: 'sbPortalMainPage',
 });
 
-Router.onBeforeAction(SB.Router.requireLogin, {except: ['portal']});
-Router.onBeforeAction('dataNotFound', {except: ['portal']});
+Router.onBeforeAction(SB.Router.requireLogin, {except: ['sbPortalMainPage']});
+Router.onBeforeAction('dataNotFound', {except: ['sbPortalMainPage']});

@@ -1,3 +1,14 @@
+/*
+	subscription in main layout
+*/
+
+Template.sbPortalMainPage.onCreated(function () {
+	var instance = this;
+	instance.subscribe('sbPortalPublications', Meteor.userId());
+});
+
+
+
 Template.userBoardsList.helpers({
 	boards: function() {
 		return SB.User.user().boards();
@@ -32,7 +43,7 @@ Template.createBoardModal.events({
     var boardName = event.target.boardName.value;
     var boardType = $(event.target.boardType).find(':selected').data("id");
 
-	Meteor.call('createBoard', boardName, Meteor.userId(), function(err, res) {
+	Meteor.call('createBoard', boardName, SB.User.ID(), function(err, res) {
 		if (err) handleServerError(err);
 		Router.go("/board/"+res);
 	})
@@ -46,8 +57,8 @@ var boardUrl = function boardUrl(boardID) {
 }
 
 Template.registerHelper("loggedIn", function() {
-	return Meteor.userId();
+	return SB.User.ID();
 });
 Template.registerHelper("notLoggedIn", function() {
-	return !Meteor.userId();
+	return !SB.User.ID();
 });

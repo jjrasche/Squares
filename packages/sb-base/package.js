@@ -37,6 +37,10 @@ Package.onUse(function (api) {
   ], both);
 
 
+  packages = ['reywood:publish-composite'];
+  api.use(packages, server);
+  api.imply(packages, server);
+
   // server only files
   api.addFiles([
     'server/mailSettings.js'
@@ -69,11 +73,10 @@ Package.onUse(function (api) {
     'client/browser/appLayout.html'
     ,'client/browser/notFound.html'
     ,'client/browser/routeConfig.js'
-    ,'client/config.accounts.js'
   ], client);
 
 
-  api.export('SB');
+  api.export(['SB', 'Meteor']);
 });
 
 Package.onTest(function (api) {  
@@ -81,7 +84,7 @@ Package.onTest(function (api) {
     , 'sanjo:jasmine@0.20.3'
   ]);
 
-  api.addFiles('tests/jasmine/client/unit/namespacerTests.js', 'client');
+  api.addFiles('tests/jasmine/client/unit/namespacerTests.js', client);
 });
 
 Npm.depends({

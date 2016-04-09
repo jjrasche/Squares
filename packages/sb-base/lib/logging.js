@@ -1,1 +1,1 @@
-SB.namespacer('SB', {debug: true});
+SB.namespacer('SB', {debug: false});
