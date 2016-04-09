@@ -85,7 +85,7 @@ Template.changeRefreshCriteria.events({
 
 Template.editWidget.helpers({
     boardOwner: function() {
-        return this.isOwner(Meteor.user());
+        return this.isOwner(SB.User.user());
     },
     squareSize: function () {
         return JSON.stringify(Session.get('size'));
@@ -272,7 +272,7 @@ Modal.show('invitePlayersModal', this);
     console.log("submit #invitePlayerForm  this: ", this, userName, email);
 
 // if email address is attached to user and user already a member, error
-var existingUser = Meteor.users.findOne({$and: [
+var existingUser = SB.User.findOne({$and: [
     {'emails.address': {$in: [null]}}, 
     {'emails.address': {$exists: true}}
     ]})
@@ -432,7 +432,7 @@ Template.memberList.helpers({
         sortObj.sort[sortData.prop] = sortData.order;
 
 // console.log("memberList: ", sortObj);
-var members = Meteor.users.find({_id: {$in: memberIDs}}, sortObj);
+var members = SB.User.find({_id: {$in: memberIDs}}, sortObj);
 // console.log("members: ", members.fetch());
 
 // console.log("members: ", memberIDs, members);

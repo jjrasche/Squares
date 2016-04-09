@@ -1,10 +1,10 @@
 initializeFixutres = function initializeFixutres() {
 	var tester; tester2; board;
 	// create users
-	if (!Meteor.users.find().count()) {	
+	if (!SB.User.find().count()) {	
 		tester = SB.User.fixture.formObject('test@test.com', 'tester', 'tttttt')
 		Accounts.createUser(tester);
-		tester = Meteor.users.findOne();
+		tester = SB.User.findOne();
 		if (SB.debug) console.log(tester);
 
 		tester2 = SB.User.fixture.formObject('test2@test.com', 'tester2', 'tttttt')

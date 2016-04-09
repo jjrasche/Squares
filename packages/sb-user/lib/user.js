@@ -1,13 +1,19 @@
-SB.namespacer('SB.User', {getUser :
+SB.namespacer('SB.User', {user :
+  function user() {
+    return new UserModel(Meteor.user());
+  }
+});
+
+SB.namespacer('SB.User', {findOne :
   // expects array of selector statements, sort object
-  function getUser(selector, sort) {
+  function findOne(selector, sort) {
     var selectObj = {}; sortObj = {sort: {}};
     if (selector !== undefined && Object.keys(selector).length)
       selectObj = selector;
     if (sort !== undefined && Object.keys(sort).length)
       sortObj.sort = sort;
 
-    console.log('selectObj: ', selectObj, selector, selector !== undefined, Object.keys(selector).length);
+    console.log('selectObj: ', selectObj, selector, (selector !== undefined && Object.keys(selector).length));
     console.log('sortObj: ', sortObj, sort, (sort !== undefined && Object.keys(sort).length));
     return Meteor.users.findOne(selectObj, sortObj,
                                 {transform: 
@@ -16,13 +22,26 @@ SB.namespacer('SB.User', {getUser :
                                   }
                               });
   }
-})
+});
 
-SB.namespacer('SB.User', {getUsers :
-  function getUsers(query, sort) {
-    
+SB.namespacer('SB.User', {find :
+  function find(selector, sort) {
+    var selectObj = {}; sortObj = {sort: {}};
+    if (selector !== undefined && Object.keys(selector).length)
+      selectObj = selector;
+    if (sort !== undefined && Object.keys(sort).length)
+      sortObj.sort = sort;
+
+    console.log('selectObj: ', selectObj, selector, (selector !== undefined && Object.keys(selector).length));
+    console.log('sortObj: ', sortObj, sort, (sort !== undefined && Object.keys(sort).length));
+    return Meteor.users.find(selectObj, sortObj,
+                                {transform: 
+                                  function(doc) {
+                                    return new UserModel(doc);
+                                  }
+                              });
   }
-})
+});
 
 
 UserModel = function(doc) {

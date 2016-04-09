@@ -1,6 +1,6 @@
 Template.userBoardsList.helpers({
 	boards: function() {
-		return Meteor.user().boards();
+		return SB.User.user().boards();
 	}
 })
 

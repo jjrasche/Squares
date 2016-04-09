@@ -23,7 +23,7 @@ User has:
 // //Board
 // canModifySquare = function canModifySquare(board, user, x, y) {
 // 	var square = board.getSquare(x,y);
-// 	var user = Meteor.user();
+// 	var user = SB.User.user();
 
 // 	if (board.locked) 
 // 		throw new Meteor.Error("board is locked, must unlock to make changes");
@@ -172,6 +172,6 @@ String.prototype.parseYYYYmmddDate = function() {
 
 /*
 	queries 
-	Meteor.users.find({}, {sort: {['status.online': -1,username: -1]}}).fetch().map(function(u){ return u.username })
-	Meteor.users.find({'status.lastLogin': {$exists: true}}, {sort: {'status.lastLogin.date': -1}}).map(function(u) { console.log(u.username + '  ' + u.status.lastLogin.date) })
+	SB.User.find({}, {sort: {['status.online': -1,username: -1]}}).fetch().map(function(u){ return u.username })
+	SB.User.find({'status.lastLogin': {$exists: true}}, {sort: {'status.lastLogin.date': -1}}).map(function(u) { console.log(u.username + '  ' + u.status.lastLogin.date) })
 */

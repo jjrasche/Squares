@@ -34,7 +34,7 @@ _.extend(BoardModel.prototype, {
         // else if (squareContainsInProgressGame(matrix[x][y])))          
         else if (squareContainsSelectedGame(matrix[x][y]))
           color = 'blue';
-        else if (this.userOccupiesSquare(Meteor.user(), x, y)) 
+        else if (this.userOccupiesSquare(SB.User.user(), x, y)) 
           color = 'orange';
         else if (this.squareIsEmpty(x, y))
           color = 'green';
@@ -48,7 +48,7 @@ _.extend(BoardModel.prototype, {
     if (cellData == SQUARE_EMPTY_VALUE) 
       return SQUARE_EMPTY_VALUE; 
     else {
-      var user = Meteor.users.findOne(cellData);
+      var user = SB.User.findOne(cellData);
       var ret = user.profile.userName;
       return ret;
     }
@@ -61,7 +61,7 @@ _.extend(BoardModel.prototype, {
   },
   getUsers : function members() { 
     return this.members.map(function(member) {
-      return Meteor.users.findOne(member._id);
+      return SB.User.findOne(member._id);
     })
   },
   numUnCommittedSquares : function getNumUnCommittedSquares() {
@@ -234,7 +234,7 @@ _.extend(BoardModel.prototype, {
   },
   canModifySquare : function canModifySquare(user, x, y) {
     var square = board.getSquare(x,y);
-    var user = Meteor.user();
+    var user = SB.User.user();
 
     if (board.locked) 
       throw new Meteor.Error("board is locked, must unlock to make changes");
@@ -304,7 +304,7 @@ BoardModel.validate = {};
 
 BoardModel.validate.modifySquare = function modifySquare(boardID, x, y) {
   var board = SB.Board.findOne(boardID);
-  var user = Meteor.user()
+  var user = SB.User.user()
 
   if (!user) throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
   if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
@@ -316,7 +316,7 @@ BoardModel.validate.modifySquare = function modifySquare(boardID, x, y) {
   if (!board) throw new Meteor.Error("boardID " + boardID + " doesn't exist");
 
   var square = board.getSquare(x,y);
-  var user = Meteor.user();
+  var user = SB.User.user();
 
   // owners have permission to remove/add any member anywhere on board
   // non-owners can remove self from squares and add self to empty squares

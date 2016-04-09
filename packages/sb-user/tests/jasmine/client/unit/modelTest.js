@@ -1,6 +1,6 @@
 describe("test functionality related to User model", function() {
   Meteor.call('resetTestingEnvironment');
-  var baseUser = Meteor.users.findOne();
+  var baseUser = SB.User.findOne();
   if (!baseUser) throw Meteor.Error('no users');
 
   it("getUser baseline", function(done) {

@@ -13,8 +13,8 @@ Router.route('/board/:_id', {
     if (board)
       Meteor.subscribe('userData',board.members.map(function(m){ return m._id }))
 
-    if (Meteor.user())
-      Session.set('chapp-username', Meteor.user().profile.userName);
+    if (SB.User.user())
+      Session.set('chapp-username', SB.User.user().profile.userName);
     Session.set('chapp-docid', id);
     Session.set('chapp-historysince',new Date());
 

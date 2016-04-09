@@ -4,16 +4,16 @@ Meteor.publish('getBoard', function(id) {
 
 Meteor.publish('getBoardUsers', function(id) {
 	var board = SB.Board.find(id);
-	return Meteor.users.find({_id: {$in: board.members}});
+	return SB.User.find({_id: {$in: board.members}});
 });
 
 Meteor.publish('getUserBoards', function(id) {
-	var boardIDs = Meteor.user().profile.boardIDs;
+	var boardIDs = SB.User.user().profile.boardIDs;
 	return SB.Board.find({_id: {$in: boardIDs}});
 });
 
 Meteor.publish("userData", function (userIDs) {
-    return Meteor.users.find({_id: {$in: userIDs}},{
+    return SB.User.find({_id: {$in: userIDs}},{
     	fields: {
         	'status': 1
         }

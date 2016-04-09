@@ -6,7 +6,7 @@ Router.configure({
 
 SB.namespacer('SB.Router', {requireLogin : 
 	function() {
-	  if (! Meteor.user())
+	  if (! SB.User.user())
 	    this.render('accessDenied');
 	  else 
 	    this.next();
