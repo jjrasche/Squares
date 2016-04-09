@@ -32,13 +32,16 @@ Package.onUse(function (api) {
   api.addFiles([
     'lib/namespace.js'
     ,'lib/dateEnhancements.js'
+    ,'server/fixture.js'
+    ,'lib/logging.js'
   ], both);
 
 
   // server only files
   api.addFiles([
     'server/mailSettings.js'
-  ],'server');
+    // ,'server/fixture.js'
+  ], server);
 
 
   // client only dependencies
@@ -67,7 +70,7 @@ Package.onUse(function (api) {
     ,'client/browser/notFound.html'
     ,'client/browser/routeConfig.js'
     ,'client/config.accounts.js'
-  ],'client');
+  ], client);
 
 
   api.export('SB');

@@ -19,6 +19,7 @@ Package.onUse(function (api) {
     'lib/game.js'
     ,'lib/gameQueries.js'
     ,'lib/gameScraper.js'
+    ,'server/fixture.js'
   ], both);
 
 

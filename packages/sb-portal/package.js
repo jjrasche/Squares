@@ -17,7 +17,8 @@ Package.onUse(function (api) {
     ,'jjrasche:sb-squares-board@0.0.1'
   ]
   api.use(packages);
-  api.imply(packages);
+  api.imply(packages);    // testing package, at least, will use depenedent packages
+
 
   api.addFiles([], server);
 
@@ -38,6 +39,7 @@ Package.onTest(function (api) {
 
   api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', 'client');
   api.addFiles('tests/jasmine/client/integration/portalPageTest.js', 'client');
+  api.export('SB');
 });
 
 Npm.depends({

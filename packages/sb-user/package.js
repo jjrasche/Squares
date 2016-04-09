@@ -1,15 +1,14 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   summary: ".",
   version: "0.0.1",
   name: "jjrasche:sb-user",
 });
 
-
 Package.onUse(function (api) {
-  var client = ['client'];
-  var server = ['server'];
-  var both = client.concat(server);
-
   // server and client dependencies
   var packages = [
     'jjrasche:sb-base'
@@ -22,7 +21,8 @@ Package.onUse(function (api) {
 
   // client only files
   api.addFiles([
-    'lib/user.js'
+    'lib/user.js',
+    'server/fixture.js'
   ], both);
 
 
@@ -46,11 +46,18 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function (api) {
-  api.use(['jjrasche:sb-portal'
+  api.use(['jjrasche:sb-user'
     ,'sanjo:jasmine@0.20.3'
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
+
+  // api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', 'client');
+  // api.addFiles('tests/jasmine/client/unit/fixtureTest.js', 'client');
+  api.addFiles('tests/jasmine/client/unit/modelTest.js', 'client');
+  api.export('SB');
 });
+
+
 
 Npm.depends({
 });

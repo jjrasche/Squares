@@ -1,0 +1,1 @@
+SB.namespacer('SB', {debug: true});

@@ -1,6 +1,28 @@
-Meteor.users._transform = function(doc) {
-  return new UserModel(doc);
-}
+SB.namespacer('SB.User', {getUser :
+  // expects array of selector statements, sort object
+  function getUser(selector, sort) {
+    var selectObj = {}; sortObj = {sort: {}};
+    if (selector !== undefined && Object.keys(selector).length)
+      selectObj = selector;
+    if (sort !== undefined && Object.keys(sort).length)
+      sortObj.sort = sort;
+
+    console.log('selectObj: ', selectObj, selector, selector !== undefined, Object.keys(selector).length);
+    console.log('sortObj: ', sortObj, sort, (sort !== undefined && Object.keys(sort).length));
+    return Meteor.users.findOne(selectObj, sortObj,
+                                {transform: 
+                                  function(doc) {
+                                    return new UserModel(doc);
+                                  }
+                              });
+  }
+})
+
+SB.namespacer('SB.User', {getUsers :
+  function getUsers(query, sort) {
+    
+  }
+})
 
 
 UserModel = function(doc) {

@@ -1,6 +1,6 @@
 var resetDatabase = function resetDatabase() {
   // safety check
-  if (!process.env.IS_MIRROR) {
+  if (!process.env.VELOCITY_TEST_PACKAGES) {
     throw new Meteor.Error(
       'NOT_ALLOWED',
       'velocityReset is not allowed outside of a mirror. Something has gone wrong.'
@@ -10,9 +10,9 @@ var resetDatabase = function resetDatabase() {
   var db = MongoInternals.defaultRemoteCollectionDriver().mongo.db;
   var collections = Meteor.wrapAsync(db.collections, db)();
   var appCollections = _.reject(collections, function (col) {
-    return col.collectionName.indexOf('velocity') === 0 ||
-      col.collectionName === 'system.indexes' ||
-      col.collectionName === 'users';
+    return col.collectionName.indexOf('velocity') === 0
+        || col.collectionName === 'system.indexes'
+        // || col.collectionName === 'users';
   });
 
   _.each(appCollections, function (appCollection) {
@@ -22,7 +22,7 @@ var resetDatabase = function resetDatabase() {
 };
 
 var resetTestingEnvironment = function resetTestingEnvironment() {
-  if (process.env.IS_MIRROR) {
+  if (process.env.VELOCITY_TEST_PACKAGES) {
     resetDatabase();
   } else {
     throw new Meteor.Error(
@@ -33,19 +33,7 @@ var resetTestingEnvironment = function resetTestingEnvironment() {
   initializeFixutres();
 };
 
-var createSBUser = function createSBUser(userData) {
-  var user = Meteor.users.findOne({username: userData.username});
-
-  if (!user) {
-    var userId = Accounts.createUser(userData);
-    user = Meteor.users.findOne(userId);
-  }
-
-  return user;
-};
-
 
 Meteor.methods({
-  resetTestingEnvironment: resetTestingEnvironment,
-  'createSBUser': createSBUser
+  resetTestingEnvironment: resetTestingEnvironment
 });

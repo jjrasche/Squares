@@ -31,8 +31,7 @@ Npm.depends({
 
 /*
   mongorestore -h 127.0.0.1 --port 3001 -d meteor dump/meteor
-  IS_MIRROR=1 velocity test-packages jjrasche:sb-base --port 3002
-    * IS_MIRROR=1 is necessary as this var is not set by velocity anymore
+  velocity test-packages jjrasche:sb-base --port 3002
 
   Model layout
   <AppName>.<Object>.model                  SB.Board.model.findOne(...)

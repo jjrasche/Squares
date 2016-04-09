@@ -1,38 +1,33 @@
 initializeFixutres = function initializeFixutres() {
+	var tester; tester2; board;
 	// create users
-	var tester = formUserObject('test@test.com', 'tester', 'tttttt')
-	Meteor.call('createSBUser',tester , function (err, res) {
-		if (!err) tester = Meteor.users.findOne(res);
-		else console.log(err);
-	});
-	console.log(tester);
+	if (!Meteor.users.find().count()) {	
+		tester = SB.User.fixture.formObject('test@test.com', 'tester', 'tttttt')
+		Accounts.createUser(tester);
+		tester = Meteor.users.findOne();
+		if (SB.debug) console.log(tester);
 
-	var tester2 = formUserObject('test2@test.com', 'tester2', 'tttttt')
-	Meteor.call('createSBUser',tester2 , function (err, res) {
-		if (!err) tester2 = Meteor.users.findOne(res);
-		else console.log(err);		
-	});
-	console.log(tester2);
+		tester2 = SB.User.fixture.formObject('test2@test.com', 'tester2', 'tttttt')
+		Accounts.createUser(tester2);
+		if (SB.debug) console.log(tester2);
+	}
 
 	// create board
-	var board;
-	Meteor.call('createBoard', 'testBoard', tester._id, function(err, res) {
-		if (!err) board = SB.Board.findOne(res);
-		else console.log(err);
-	});
-	console.log(board);
+	if (!SB.Board.find().count()) {
+		Meteor.call('createBoard', 'testBoard', tester._id, function(err, res) {
+			if (!err) board = SB.Board.findOne(res);
+			else console.log(err);
+		});
+		if (SB.debug) console.log(board);
+	}
 
-
-}
-
-
-var formUserObject = function formUserObject(email, userName, password) {
-	return {
-			email: email, 
-			username: userName,
-			profile: {
-				userName: userName
-			},
-			password: password
+	// create games
+	if (!SB.Game.find().count()) {
+		var games = [];
+		for (var i = 0; i < 64; i++) {
+			var gameID = SB.Game.insert(SB.Game.fixture.randomGame());
+			if (gameID) games.push(SB.Game.findOne(gameID));
+		}
+		if (SB.debug) console.log(games[0]);
 	}
 }

@@ -1,3 +1,7 @@
+var client = ['client'];
+var server = ['server'];
+var both = client.concat(server);
+
 Package.describe({
   name: 'jjrasche:sb-testing',
   version: '0.0.1',
@@ -8,10 +12,14 @@ Package.describe({
 Package.onUse(function (api) {  
   api.use([
     'jjrasche:sb' // testing package needs access to all data and methods of the full app 
-  ], 'server');
+    ,'velocity:html-reporter'
+  ], both);
 
   api.addFiles([
     'fixtureMethod.js'
     , 'baseFixtures.js'
     ], 'server');
 });
+
+Package.onTest(function (api) {
+})
