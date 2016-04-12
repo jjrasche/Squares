@@ -1,1 +1,1 @@
-SB.namespacer('SB.Portal' {viewableBoardsLimit : 5});
+SB.namespacer('SB.Portal', {viewableBoardsLimit : 5});

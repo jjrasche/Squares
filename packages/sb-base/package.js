@@ -23,7 +23,7 @@ Package.onUse(function (api) {
     // ,'meteorhacks:ssr'
     ,'aldeed:collection2'
     ,'aldeed:autoform'
-    ,'autopublish'
+    // ,'autopublish'
     ,'check'
   ];
   api.use(packages, both);
@@ -58,7 +58,6 @@ Package.onUse(function (api) {
     ,'ecmascript'
     ,'highcharts:highcharts-meteor'
     ,'highcharts-container'
-    ,'ian:accounts-ui-bootstrap-3'
     ,'twbs:bootstrap'
     ,'peppelg:bootstrap-3-modal'
     ,'yogiben:autoform-modals'
@@ -70,7 +69,8 @@ Package.onUse(function (api) {
 
   // client only files
   api.addFiles([
-    'client/browser/appLayout.html'
+    'client/browser/commonFunctions.js'
+    ,'client/browser/appLayout.html'
     ,'client/browser/notFound.html'
     ,'client/browser/routeConfig.js'
   ], client);
@@ -81,7 +81,7 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {  
   api.use(['jjrasche:sb-base'
-    , 'sanjo:jasmine@0.20.3'
+    , 'sanjo:jasmine@0.21.0'
   ]);
 
   api.addFiles('tests/jasmine/client/unit/namespacerTests.js', client);

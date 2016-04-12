@@ -1,5 +1,5 @@
 describe("User model functionality Client", function() {
-  Meteor.call('resetTestingEnvironment');
+  // Meteor.call('resetTestingEnvironment');
 
   it("SB.User.user works on client", function(done) {
     expect(SB.User.user()).toBeUndefined();

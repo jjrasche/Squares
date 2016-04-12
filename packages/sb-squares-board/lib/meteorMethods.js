@@ -44,10 +44,10 @@ Meteor.methods({
 			console.log("squares: ", squares);
 			console.log("tempPassword: ", tempPassword);
 		}
-		if (!SB.User.user())	throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
-		if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
-		if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
-		if (!boardOwner) throw new Meteor.Error(INVALID_BOARD_OWNER_ERROR);
+		if (!SB.User.user())	throw new Meteor.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!user) throw new Meteor.Error(SB.ErrMsg.INVALID_USER_ERROR);
+		if (!boardOwner) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_OWNER_ERROR);
 
 
 		if (Meteor.isServer) {
@@ -86,9 +86,9 @@ Meteor.methods({
 			console.log("userID: ", userID);
 			console.log("squares: ", squares);
 		}
-		if (!SB.User.user())	throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
-		if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
-		if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
+		if (!SB.User.user())	throw new Meteor.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!user) throw new Meteor.Error(SB.ErrMsg.INVALID_USER_ERROR);
 
 		board.modifySquare(user, squares);
 	},
@@ -101,9 +101,9 @@ Meteor.methods({
 			console.log("boardID: ", boardID);
 			console.log("userID: ", userID);
 		}
-		if (!SB.User.user())	throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
-		if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
-		if (!newOwner) throw new Meteor.Error(INVALID_USER_ERROR);
+		if (!SB.User.user())	throw new Meteor.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!newOwner) throw new Meteor.Error(SB.ErrMsg.INVALID_USER_ERROR);
 		if (!board.isOwner(SB.User.user())) throw new Meteor.Error("Only owners can add an owner.");
 
 		// do not add an owner twice
@@ -114,34 +114,6 @@ Meteor.methods({
 		SB.Board.update({_id: board._id}, {$set: {owners: board.owners}});
 		
 	},
-	createBoard: function(boardName, userID) {
-		var user = SB.User.findOne(userID);
-
-		if (SB.debug) {
-			console.log("---- createBoard ----");
-			console.log("boardName: ", boardName);
-			console.log("userID: ", userID);
-		}
-		if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
-
-		board = {};
-		board.owners = [userID];
-		board.name = boardName;
-		board.members = [{
-			_id: userID,
-			numSquares: 0,
-			paid: false
-		}];
-		board.locked = false;
-		var boardID = SB.Board.insert(board);
-
-		// add board to user's boardIDs
-		var boardIDs = user.profile.boardIDs; 
-		boardIDs.push(boardID);
-		Meteor.users.update(user._id, {$set: {'profile.boardIDs': boardIDs}});
-
-		return boardID;
-	},
 	randomizeBoardNumbers: function(boardID) {
 		var board = SB.Board.findOne(boardID);
 
@@ -149,8 +121,8 @@ Meteor.methods({
 			console.log("---- randomizeBoardNumbers ----");
 			console.log("boardID: ", boardID);
 		}
-		if (!SB.User.user())	throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
-		if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
+		if (!SB.User.user())	throw new Meteor.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
 		if (!board.isOwner(SB.User.user())) throw new Meteor.Error("Only owners can add an owner.");
 
 		if (!board.locked) {

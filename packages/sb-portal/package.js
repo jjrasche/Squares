@@ -19,6 +19,11 @@ Package.onUse(function (api) {
   api.use(packages);
   api.imply(packages);    // testing package, at least, will use depenedent packages
 
+  api.addFiles([
+    'lib/namespace.js'
+    ,'lib/meteorMethods.js'
+  ], both);
+
 
   api.addFiles([
     'server/publish.js'
@@ -35,13 +40,13 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {  
   api.use(['jjrasche:sb-portal'
-    ,'sanjo:jasmine@0.20.3'
-    // ,'jjrasche:sb-testing'    // debug only so only compiled when Testing
+    ,'sanjo:jasmine@0.21.0'
+    ,'jjrasche:sb-testing'    // debug only so only compiled when Testing
   ], both);
 
   api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
   api.addFiles('tests/jasmine/client/integration/portalPageTest.js', client);
-  api.export('SB');
+  api.export(['SB', 'Meteor']);
 });
 
 Npm.depends({

@@ -1,5 +1,5 @@
 describe("User model functionality Server", function() {
-  Meteor.call('resetTestingEnvironment');
+  // Meteor.call('resetTestingEnvironment');
 
 
   it("getUser baisc query selector works", function(done) {

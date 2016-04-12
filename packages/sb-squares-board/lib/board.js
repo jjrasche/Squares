@@ -1,10 +1,11 @@
-SQUARE_EMPTY_VALUE = 'None';
-NOT_LOGGED_IN_ERROR = 'User not logged in';
-INVALID_BOARD_ERROR = 'Board not found';
-INVALID_USER_ERROR = 'Board not found';
-INVALID_BOARD_OWNER_ERROR = 'Board owner not found';
-CANT_CHANGE_OTHERS_SQUARES_ERROR = 'Only the board owner has permission to change another players squares';
+SB.namespacer('SB.ErrMsg', {INVALID_BOARD_ERROR : 'Board not found'});
+SB.namespacer('SB.ErrMsg', {INVALID_USER_ERROR : 'User not found'});
+SB.namespacer('SB.ErrMsg', {NOT_LOGGED_IN_ERROR : 'User not logged in'});
+SB.namespacer('SB.ErrMsg', {INVALID_BOARD_OWNER_ERROR : 'Board owner not found'});
+
 NUM_SQUARES = 100;
+SQUARE_EMPTY_VALUE = 'None';
+
 
 SB.namespacer('SB', {Board: 
   new Mongo.Collection('boards', {
@@ -306,9 +307,9 @@ BoardModel.validate.modifySquare = function modifySquare(boardID, x, y) {
   var board = SB.Board.findOne(boardID);
   var user = SB.User.user()
 
-  if (!user) throw new Meteor.Error(NOT_LOGGED_IN_ERROR);
-  if (!board) throw new Meteor.Error(INVALID_BOARD_ERROR);
-  if (!user) throw new Meteor.Error(INVALID_USER_ERROR);
+  if (!user) throw new Meteor.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+  if (!board) throw new Meteor.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+  if (!user) throw new Meteor.Error(SB.ErrMsg.INVALID_USER_ERROR);
 
   if (!boardID) throw new Meteor.Error("boardID not set");
 

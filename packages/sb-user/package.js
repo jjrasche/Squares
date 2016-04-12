@@ -38,6 +38,7 @@ Package.onUse(function (api) {
 
   // client only dependencies
   api.use([
+    'ian:accounts-ui-bootstrap-3'
   ], client);
 
   // client only files
@@ -48,7 +49,7 @@ Package.onUse(function (api) {
 
 Package.onTest(function (api) {
   api.use(['jjrasche:sb-user'
-    ,'sanjo:jasmine@0.20.3'
+    ,'sanjo:jasmine@0.21.0'
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
 

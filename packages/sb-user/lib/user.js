@@ -2,12 +2,17 @@ SB.namespacer('SB.User', {user :
   function user() {
     var user = Meteor.isClient ? Meteor.user() : this.user();
     if (user) return new SB.User.model(user);
+    else return null;
   }
 });
 
 SB.namespacer('SB.User', {ID :
   function ID() {
-    return Meteor.userId();
+    if (Meteor.isServer) console.log('sdfljsdf');
+    var userID = Meteor.isClient ? Meteor.userId() : this.userId();
+    return userID;
+    // if (user) return user._id;
+    // else return null;
   }
 });
 
@@ -68,9 +73,6 @@ _.extend(SB.User.model.prototype, {
 
 
 var userProfileSchema = new SimpleSchema({
-  // userName: {
-  //     type: String,
-  // },
   firstName: {
       type: String,
       optional: true

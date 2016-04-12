@@ -1,5 +1,8 @@
 Router.route('/', {
-  name: 'sbPortalMainPage',
+	name: 'sbPortalMainPage',
+	// waitOn: function() {
+	// 	return Meteor.subscribe('sbPortalPublications', SB.User.ID());
+	// },
 });
 
 Router.onBeforeAction(SB.Router.requireLogin, {except: ['sbPortalMainPage']});

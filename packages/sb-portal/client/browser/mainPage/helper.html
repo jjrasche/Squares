@@ -1,40 +1,41 @@
-<template name="loggedOutMessage">
+<template name="sbPortalLoggedOutMessage">
 	{{#if notLoggedIn}}
-	<center>
-		sign up / log in <br>
-		to create or see your boards.
-	</center>
+		<center>
+			sign up / log in <br>
+			to create or see your boards.
+		</center>
 	{{/if}}
 </template>
 
-<template name="userBoardsList">
+<template name="sbPortalUserBoardsList">
 	{{#if loggedIn}}
-		<ul clas="list-group sbPortalBoardList">
+		<ul clas="list-group sbPortalUsersBoardList">
 		{{#each boards}}
-			{{> userBoard}}
+			{{> sbPortalUserBoard}}
 		{{/each}}
 		</ul>
 	{{/if}}
 </template>
 
-<template name="userBoard">
-	<li class="list-group-item sbPortalBoard">
+<template name="sbPortalUserBoard">
+	<li class="list-group-item sbPortalUsersBoard">
 		<a href="{{boardLink}}">{{boardName}}</a>
 	</li>
 </template>
 
 
-<template name="createBoardAutoformModal">
-	{{> autoformModals}}
-	{{#afModal class="btn btn-primary" collection="Board" meteorMethod="createBoard" operation="insert" fields="name,NCAATournament"}}
-	  Create Board
-	{{/afModal}}
+<template name ="sbPortalCreateBoardModalWidget">
+	{{#if loggedIn}}
+		{{> sbPortalCreateBoardButton}}
+		{{> sbPortalCreateBoardModal}}
+	{{/if}}
 </template>
 
+<template name="sbPortalCreateBoardButton">
+ 	<button class="btn btn-primary" id="sbPortalCreateBoardButton">Create Board</button>
+</template>
 
-<template name="createBoardModal">
-	{{#if loggedIn}}
-		<button class="btn btn-primary" id="createBoardButton">Create Board</button>
+<template name="sbPortalCreateBoardModal">
 	    <div class="modal fade">
 	        <div class="modal-dialog">
 	            <div class="modal-content">
@@ -42,18 +43,17 @@
 	                    <h4 class="modal-title"></h4>
 	                </div>
 	                <div class="modal-body">
-		                <form title="create board" id="createBoardForm">
+		                <form title="create board" id="sbPortalCreateBoardForm">
 		                	<div class="form-group">
 	 	                		<label class="control-label" for="boardNameCreateBoardModal">Board Name</label>
-	 	                		<input type="text" id="boardNameCreateBoardModal" name="boardName">
+	 	                		<input type="text" id="sbPortalBoardNameCreateBoardModal" name="boardName">
 		                	</div>
-		                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Create</button>
+		                	<button id="sbPortalAssignSquaresModalButton" type="submit" class="btn btn-primary">Create</button>
 		                </form>
 		            </div>
 	                <div class="modal-footer"></div>
 	            </div>
 	        </div>
 	    </div>
-	{{/if}}
 </template>
 
