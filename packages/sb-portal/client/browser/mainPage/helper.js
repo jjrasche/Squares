@@ -32,25 +32,33 @@ Template.sbPortalUserBoard.helpers({
 
 
 Template.sbPortalCreateBoardModalWidget.events({
-  'click #sbPortalCreateBoardButton' : function(event){
-    //event.preventDefault();
-    console.log("click #sbPortalCreateBoardButton: ", this);
-    Modal.show('sbPortalCreateBoardModal');
-  },
   'change #category-select' : function(event) {
   	event.preventDefault();
   	// can't get the selection to trigger adding more fields
   	console.log("change select: ", $(event.target.boardType).find(':selected').data("id"))
-  },
+  }
+});
+
+Template.sbPortalCreateBoardButton.events({
+  'click #sbPortalCreateBoardButton' : function(event){
+    event.preventDefault();
+    console.log("click #sbPortalCreateBoardButton: ", this);
+    Modal.show('sbPortalCreateBoardModal');
+  }
+});
+
+Template.sbPortalCreateBoardModal.events({
   'submit #sbPortalCreateBoardForm' : function(event) {
     event.preventDefault();
     var boardName = event.target.boardName.value;
     var boardType = $(event.target.boardType).find(':selected').data("id");
 
-  	Meteor.call('createBoard', boardName, SB.User.ID(), function(err, res) {
-  		if (err) handleServerError(err);
-  		Router.go("/board/"+res);
-  	})
+    console.log('sbPortalCreateBoardForm: ', boardName, boardType);
+    Meteor.call('createBoard', boardName, SB.User.ID(), function(err, res) {
+      if (err) handleServerError(err);
+      Router.go("/board/"+res);
+      console.log('return createBoard: ', res);
+    })
     Modal.hide('sbPortalCreateBoardModal');
   }
 });

@@ -61,6 +61,7 @@ for (var x = 0; x < 10; x++) {
       label: "ID of owner of square in position (" + x + ", " + y + ") in the 10 x 10 map", 
       optional: true
     }
+    console.log('adding: ', SB.Board.getSquareKey(x, y));
     schemaObject[SB.Board.getSquareKey(x, y)] = obj;
   }
 }

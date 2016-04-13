@@ -129,7 +129,7 @@ Template.grid.helpers({
 
         // Use Meteor.defer() to craete chart after DOM is ready:
         Meteor.defer(function() {
-            Highcharts.chart('chart1', {
+            var chartOptions = {
                 chart: { 
                     type: 'heatmap', 
                     spacingBottom: 15,
@@ -187,80 +187,77 @@ Template.grid.helpers({
                         }
                     }
                 },
-    tooltip: {
-        formatter: function () {
-            if (!board.locked) return;
-
-            var x = this.point.x;
-            var y = this.point.y;
-            var realx = this;
-            var games = gameMatrix[x][y];
-            var ret = "<b><u>Games Hit:</u></b><br>";
-            for (var i = 0; i < games.length; i++) {
-                var game = games[i];
-                ret +=  "(" + board.gamePoints(game) + ")" + 
-                game.homeTeam.name + " " + game.homeScore + " " +
-                game.awayTeam.name + " " + game.awayScore + "<br>"
+                colorAxis: {
+                    stops: [
+                    [0, '#3060cf'],
+                    [0.5, '#fffbbc'],
+                    [0.9, '#c4463a']]
+                },
+                series: [{
+                    name: '',
+                    title: '',
+                    borderWidth: 3,
+                    backgroundColor: '#303030',
+                    data: board.formatData(),
+                    dataLabels: {
+                        formatter: function () {
+                        // only do this once per board to be uniform
+                            var square = {x: this.point.x, y: this.point.y};
+                            if (square.x==0 && square.y==0) {
+                                var size = this.point.shapeArgs.height;
+                                // console.log(this);
+                                var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
+                                Session.set('boardPageCharactersPerLine', charactersPerLine);
+                                Session.set('size', {chars:  charactersPerLine, size: size});
+                                // console.log('charperline: ', charactersPerLine);
+                            }
+                            var squareScore = board.squareTotalWinnings(square, gameMatrix);
+                            var charactersPerLine = Session.get('boardPageCharactersPerLine');
+                            var text = this.point.value;
+                            var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
+                            // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
+                            return '<div class="js-ellipse" style="" title="' 
+                            + text + '">' + formatted + '<br>' + squareScore + '</br>' + '</div>';
+                        },
+                        allowOverlap: false,
+                        enabled: true,
+                        color: '#000000',
+                        crop: true,
+                        borderColor: 'red',
+                        borderWidth: 0,
+                        padding: 0,
+                        style: {
+                            fontWeight: 'bold'
+                        }
+                    },
+                }],
+                legend: {
+                    enabled: false
+                }        
             }
-            return ret;
-    //gameMatrix[x][y] + calculateNumPoints(x,y); //"(" + x + "," + y + ")";
-    }
-    },
-    colorAxis: {
-        stops: [
-        [0, '#3060cf'],
-        [0.5, '#fffbbc'],
-        [0.9, '#c4463a']]
-    },
-    series: [{
-        name: '',
-        title: '',
-        borderWidth: 3,
-        backgroundColor: '#303030',
-        data: board.formatData(),
-        dataLabels: {
-            formatter: function () {
-    // only do this once per board to be uniform
-    var square = {x: this.point.x, y: this.point.y};
-    if (square.x==0 && square.y==0) {
-        var size = this.point.shapeArgs.height;
-    // console.log(this);
-    var charactersPerLine = (size < 30) ? 5 : Math.floor(size/10);
-    Session.set('boardPageCharactersPerLine', charactersPerLine);
-    Session.set('size', {chars:  charactersPerLine, size: size});
-    // console.log('charperline: ', charactersPerLine);
-    }
-    var squareScore = board.squareTotalWinnings(square, gameMatrix);
-    var charactersPerLine = Session.get('boardPageCharactersPerLine');
-    var text = this.point.value;
-    var formatted = text.length > charactersPerLine ? text.substring(0, charactersPerLine) + '...' : text;
-    // console.log("formatter: ", text, size, charactersPerLine, formatted, this.x, this.y);
-    return '<div class="js-ellipse" style="" title="' 
-    + text + '">' + formatted + '<br>' + squareScore + '</br>' + '</div>'
-    ;
-    },
-    allowOverlap: false,
-    enabled: true,
-    color: '#000000',
-    crop: true,
-    borderColor: 'red',
-    borderWidth: 0,
-    padding: 0,
-    //shadow: true,
-    style: {
-        fontWeight: 'bold'
-    }
-    },
-    //          tooltip: {
-    //              headerFormat: '<b>Games hit</b> <br/>',
-    //              pointFormat: 'uconn 52 delaware 43 rnd 1 <br/> miami 52 Michigan 43 rnd 2 <br/>'
-    //          }
-    }],
-    legend: {
-        enabled: false
-    },            
-    })
-    });
+            if (true){//board.locked) {
+                chartOptions['tooltip'] = {
+                    formatter: function () {
+                        if (!board.locked) return false;
+
+                        var x = this.point.x;
+                        var y = this.point.y;
+                        var realx = this;
+                        var games = gameMatrix[x][y];
+                        var ret = "<b><u>Games Hit:</u></b><br>";
+                        for (var i = 0; i < games.length; i++) {
+                            var game = games[i];
+                            ret +=  "(" + board.gamePoints(game) + ")" + 
+                            game.homeTeam.name + " " + game.homeScore + " " +
+                            game.awayTeam.name + " " + game.awayScore + "<br>"
+                        }
+                        return ret;
+                    }
+                }
+            }
+
+            Highcharts.chart('chart1', chartOptions);
+        });
     }
 });
 
@@ -276,98 +273,99 @@ Template.lockBoardButton.events({
 
 Template.invitePlayersModal.events({
     'click #invitePlayersButton' : function(event){
-//event.preventDefault();
-if($('#invitePlayersButton').hasClass('disabled')) return;
-console.log("click #invitePlayersButton: ", this);
-Modal.show('invitePlayersModal', this);
-},
-'submit #invitePlayerForm' : function(event) {
-    event.preventDefault();
-    var squares = Session.get('boardPageselectedSquares');
-    var email = event.target.email.value == '' ? null : event.target.email.value;
-    var username = event.target.username.value;
-    var board = this;
-    var boardID = board._id;
-    var userID;
-    console.log("submit #invitePlayerForm  this: ", this, username, email);
+    //event.preventDefault();
+    if($('#invitePlayersButton').hasClass('disabled')) return;
+    console.log("click #invitePlayersButton: ", this);
+    Modal.show('invitePlayersModal', this);
+    },
+    'submit #invitePlayerForm' : function(event) {
+        event.preventDefault();
+        var squares = Session.get('boardPageselectedSquares');
+        var email = event.target.email.value == '' ? null : event.target.email.value;
+        var username = event.target.username.value;
+        var board = this;
+        var boardID = board._id;
+        var userID;
+        console.log("submit #invitePlayerForm  this: ", this, username, email);
 
-// if email address is attached to user and user already a member, error
-var existingUser = SB.User.findOne({$and: [
-    {'emails.address': {$in: [null]}}, 
-    {'emails.address': {$exists: true}}
-    ]})
-if (existingUser && board.boardMember(existingUser)) {
-    console.log("existingUser: ", existingUser);
-    throw new Meteor.Error("User already on board, try re-assigning squares");
-}
-
-// create user if doesn't exist
-if (!existingUser) {
-    console.log("inserting new user",  boardID, email, username, squares);
-    Meteor.call('createUserAndInvitation', boardID, email, username, squares, 
-        function(err, res) {
-            console.log("createUser callback: ", err, res);
-            if (err)
-                handleServerError(err);
-            userID = res
-        })
-}
-else {
-    console.log("found existing user: ", existingUser);
-    userID = existingUser._id;
-    Meteor.call('sendInvitation', boardID, userID, squares, 
-        function(err, res) {
-            if (err)
-                handleServerError(err);
+        // if email address is attached to user and user already a member, error
+        var existingUser = SB.User.findOne({$and: [
+                {'emails.address': {$in: [null]}}, 
+                {'emails.address': {$exists: true}}]
         });
-}
+        if (existingUser && board.boardMember(existingUser)) {
+            console.log("existingUser: ", existingUser);
+            throw new Meteor.Error("User already on board, try re-assigning squares");
+        }
 
-Session.set('boardPageselectedSquares', []);
-Modal.hide('invitePlayersModal');
-}
+        // create user if doesn't exist
+        if (!existingUser) {
+            console.log("inserting new user",  boardID, email, username, squares);
+            Meteor.call('createUserAndInvitation', boardID, email, username, squares, 
+                function(err, res) {
+                    console.log("createUser callback: ", err, res);
+                    if (err)
+                        handleServerError(err);
+                    userID = res
+                }
+            );
+        }
+        else {
+            console.log("found existing user: ", existingUser);
+            userID = existingUser._id;
+            Meteor.call('sendInvitation', boardID, userID, squares, 
+                function(err, res) {
+                    if (err)
+                        handleServerError(err);
+                });
+        }
+
+        Session.set('boardPageselectedSquares', []);
+        Modal.hide('invitePlayersModal');
+    }
 });
 
 
 Template.assignSquaresModal.events({
     'click #assignSelectedSquares' : function(event){
-//event.preventDefault();
-if($('#assignSelectedSquares').hasClass('disabled')) return;
-console.log("click #assignSelectedSquares: ", this);
-Modal.show('assignSquaresModal', this);
-},
-'submit #assignSquareForm' : function(event) {
-    event.preventDefault();
-    var squares = Session.get('boardPageselectedSquares');
-    var userID = $(event.target.members).find(':selected').data("id");
+    //event.preventDefault();
+    if($('#assignSelectedSquares').hasClass('disabled')) return;
+    console.log("click #assignSelectedSquares: ", this);
+    Modal.show('assignSquaresModal', this);
+    },
+    'submit #assignSquareForm' : function(event) {
+        event.preventDefault();
+        var squares = Session.get('boardPageselectedSquares');
+        var userID = $(event.target.members).find(':selected').data("id");
 
-    try {
-        Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
-            if (err)
-                handleServerError(err);
-        });
-    } catch (e) {}
-    Session.set('boardPageselectedSquares', []);
-    Modal.hide('assignSquaresModal');
-}
+        try {
+            Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
+                if (err)
+                    handleServerError(err);
+            });
+        } catch (e) {}
+        Session.set('boardPageselectedSquares', []);
+        Modal.hide('assignSquaresModal');
+    }
 });
 
 
 Template.changeBoardOwnershipModal.events({
     'click #changeBoardOwnershipButton' : function(event){
-//event.preventDefault();
-Modal.show('changeBoardOwnershipModal', this);
-},
-'submit #addBoardOwnerForm' : function(event) {
-    event.preventDefault();
-    var userID = $(event.target.members).find(':selected').data("id");
+    //event.preventDefault();
+    Modal.show('changeBoardOwnershipModal', this);
+    },
+    'submit #addBoardOwnerForm' : function(event) {
+        event.preventDefault();
+        var userID = $(event.target.members).find(':selected').data("id");
 
-    Meteor.call('addOwner', this._id, userID, function(err, res) {
-        if (err)
-            handleServerError(err);
-    });
+        Meteor.call('addOwner', this._id, userID, function(err, res) {
+            if (err)
+                handleServerError(err);
+        });
 
-    Modal.hide('changeBoardOwnershipModal');
-}
+        Modal.hide('changeBoardOwnershipModal');
+    }
 });
 
 
@@ -384,13 +382,12 @@ Template.gameList.events({
         var games = Session.get('boardPageselectedGames');
 
         if (!gameIsSelected(selectedGame)) 
-games.push(selectedGame);                       // add
-else
-games.splice(games.indexOf(selectedGame), 1);   // remove
+            games.push(selectedGame);                        // add
+        else games.splice(games.indexOf(selectedGame), 1);   // remove
 
-console.log("click .gameItems", games);
-Session.set('boardPageselectedGames', games);
-}
+        console.log("click .gameItems", games);
+        Session.set('boardPageselectedGames', games);
+    }
 });
 
 Template.gameList.helpers({
@@ -451,22 +448,23 @@ Template.memberList.helpers({
         var sortObj = {sort: {'status.online': -1}};
         sortObj.sort[sortData.prop] = sortData.order;
 
-// console.log("memberList: ", sortObj);
-var members = SB.User.find({_id: {$in: memberIDs}}, sortObj);
-// console.log("members: ", members.fetch());
+        // console.log("memberList: ", sortObj);
+        var members = SB.User.find({_id: {$in: memberIDs}}, sortObj);
+        // console.log("members: ", members.fetch());
 
-// console.log("members: ", memberIDs, members);
-return members;
-},
-header : function() {
-    return {
-        name: "member",
-        numSquares: "#",
-        winnings: "$",
-        paid: "paid"
+        // console.log("members: ", memberIDs, members);
+        return members;
+    },
+    header : function() {
+        return {
+            name: "member",
+            numSquares: "#",
+            winnings: "$",
+            paid: "paid"
+        }
     }
-}
 });
+
 Template.memberItem.helpers({
     name: function() {
         if (this == "header") return "member";
@@ -513,41 +511,39 @@ Template.memberItem.helpers({
     }
 });
 Template.memberItem.events({
-// for any of the header clicks, sort by that row
-"click .memberListHeaderName": function(event) {
-    var currSort = Session.get('boardPageMemberListSort');
-    var currOrder = currSort.order;
-    var newSort;
-    var newProp = 'username';
+    // for any of the header clicks, sort by that row
+    "click .memberListHeaderName": function(event) {
+        var currSort = Session.get('boardPageMemberListSort');
+        var currOrder = currSort.order;
+        var newSort;
+        var newProp = 'username';
 
-// if sorting same property, inverse the sort
-if (currSort.prop == newProp) {
-    var newOrder = currOrder==1 ? -1 : 1
-    newSort = {prop: newProp, order: newOrder};
-}
-else 
-    newSort = {prop: newProp, order: 1}
+        // if sorting same property, inverse the sort
+        if (currSort.prop == newProp) {
+            var newOrder = currOrder==1 ? -1 : 1
+            newSort = {prop: newProp, order: newOrder};
+        }
+        else newSort = {prop: newProp, order: 1}
 
-Session.set('boardPageMemberListSort', newSort);
-console.log("click .memberListHeaderName", newSort);
-},
-"click .memberListHeaderNumSquares": function(event) {
-    var currSort = Session.get('boardPageMemberListSort');
-    var currOrder = currSort.order;
-    var newSort;
-    var newProp = 'username';
+        Session.set('boardPageMemberListSort', newSort);
+        console.log("click .memberListHeaderName", newSort);
+    },
+    "click .memberListHeaderNumSquares": function(event) {
+        var currSort = Session.get('boardPageMemberListSort');
+        var currOrder = currSort.order;
+        var newSort;
+        var newProp = 'username';
 
-// if sorting same property, inverse the sort
-if (currSort.prop == newProp) {
-    var newOrder = currOrder==1 ? -1 : 1
-    newSort = {prop: newProp, order: newOrder};
-}
-else 
-    newSort = {prop: newProp, order: 1}
+        // if sorting same property, inverse the sort
+        if (currSort.prop == newProp) {
+            var newOrder = currOrder==1 ? -1 : 1
+            newSort = {prop: newProp, order: newOrder};
+        }
+        else newSort = {prop: newProp, order: 1}
 
-// Session.set('boardPageMemberListSort', newSort);
-console.log("click .memberListHeaderName", newSort);
-},
+        // Session.set('boardPageMemberListSort', newSort);
+        console.log("click .memberListHeaderName", newSort);
+    }
 });
 
 
@@ -555,12 +551,11 @@ console.log("click .memberListHeaderName", newSort);
 Template.registerHelper('boardPageEditButtonDisabled', 
     function(){
         if (Session.get('boardPageEditMode') ) {
-//&& Session.get('boardPageselectedSquares').length > 0)
-return "";
-}
-else 
-    return "disabled";
-}
+        //&& Session.get('boardPageselectedSquares').length > 0)
+        return "";
+        }
+        else return "disabled";
+    }
 );
 
 
@@ -572,5 +567,6 @@ handleServerError = function handleServerError(err) {
 Template.registerHelper('printThis',
     function(name) {
         console.log("printThis (" + name + "): " , this);
-    })
+    }
+);
 
