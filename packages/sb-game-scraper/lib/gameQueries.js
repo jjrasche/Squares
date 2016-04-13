@@ -34,7 +34,7 @@ SB.namespacer('SB.Game.query.function', { mostRecentWeeks :
     var mostRecentGameDate = SB.Date.mostRecentGameDate();
     if (!mostRecentGameDate) return [];
     var mostRecentMonday = mostRecentGameDate.mostRecentMonday().clearTime();
-    return [{date: {$gte: mostRecentMonday, $lt: getEndTodayDate()}}];
+    return [{date: {$gte: mostRecentMonday, $lt: SB.Date.endToday()}}];
   }
 });
 

@@ -36,7 +36,25 @@ Session.set('boardPageselectedSquares', []);
 Session.set('boardPageselectedGames', []);
 Session.set('boardPageselectedMembers', []);
 Session.set('boardPageEditMode', false);
-Session.set('boardPageMemberListSort', {prop: 'profile.userName', order: 1});
+Session.set('boardPageMemberListSort', {prop: 'username', order: 1});
+
+
+// Template.sbSquaresBoardPage.onCreated(function () {
+//     var instance = this;
+//     var boardID = instance.data;
+
+//     instance.autorun(function () {
+//         var subscription = instance.subscribe('sbSquaresBoardPublication', boardID);
+
+//         // if subscription is ready, set limit to newLimit
+//         if (subscription.ready()) {
+//             instance.data = SB.Board.findOne(boardId);
+//         } else {
+//             console.log("> Subscription is not ready yet. \n\n");
+//         }
+//     });
+// });
+
 
 
 Template.editCheckBox.events({
@@ -171,6 +189,8 @@ Template.grid.helpers({
                 },
     tooltip: {
         formatter: function () {
+            if (!board.locked) return;
+
             var x = this.point.x;
             var y = this.point.y;
             var realx = this;
@@ -265,11 +285,11 @@ Modal.show('invitePlayersModal', this);
     event.preventDefault();
     var squares = Session.get('boardPageselectedSquares');
     var email = event.target.email.value == '' ? null : event.target.email.value;
-    var userName = event.target.userName.value;
+    var username = event.target.username.value;
     var board = this;
     var boardID = board._id;
     var userID;
-    console.log("submit #invitePlayerForm  this: ", this, userName, email);
+    console.log("submit #invitePlayerForm  this: ", this, username, email);
 
 // if email address is attached to user and user already a member, error
 var existingUser = SB.User.findOne({$and: [
@@ -283,8 +303,8 @@ if (existingUser && board.boardMember(existingUser)) {
 
 // create user if doesn't exist
 if (!existingUser) {
-    console.log("inserting new user",  boardID, email, userName, squares);
-    Meteor.call('createUserAndInvitation', boardID, email, userName, squares, 
+    console.log("inserting new user",  boardID, email, username, squares);
+    Meteor.call('createUserAndInvitation', boardID, email, username, squares, 
         function(err, res) {
             console.log("createUser callback: ", err, res);
             if (err)
@@ -353,7 +373,7 @@ Modal.show('changeBoardOwnershipModal', this);
 
 Template.boardMemeberSelector.helpers({
     boardMembers : function() {
-        return this.getUsers();
+        return this.getMembers();
     }
 })
 
@@ -450,7 +470,7 @@ header : function() {
 Template.memberItem.helpers({
     name: function() {
         if (this == "header") return "member";
-        return this.profile.userName;
+        return this.username;
     },
     numSquares: function(board) {
         if (this == "header") return "#";
@@ -498,7 +518,7 @@ Template.memberItem.events({
     var currSort = Session.get('boardPageMemberListSort');
     var currOrder = currSort.order;
     var newSort;
-    var newProp = 'profile.userName';
+    var newProp = 'username';
 
 // if sorting same property, inverse the sort
 if (currSort.prop == newProp) {
@@ -515,7 +535,7 @@ console.log("click .memberListHeaderName", newSort);
     var currSort = Session.get('boardPageMemberListSort');
     var currOrder = currSort.order;
     var newSort;
-    var newProp = 'profile.userName';
+    var newProp = 'username';
 
 // if sorting same property, inverse the sort
 if (currSort.prop == newProp) {

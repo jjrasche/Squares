@@ -147,7 +147,7 @@
  	                		<input type="text" id="emailInvitePlayerModal" name="email">
 
  	                		<label class="control-label" for="userNameInvitePlayerModal">User Name</label>
- 	                		<input type="text" id="userNameInvitePlayerModal" name="userName">
+ 	                		<input type="text" id="userNameInvitePlayerModal" name="username">
 	                	</div>
 	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
 	                </form>
@@ -165,7 +165,7 @@
 	<select id="category-select" name="members">
 	    <option disabled="disabled" selected="selected">Please Select</option> 
 	    {{#each boardMembers}}
-	        <option value="{{this.profile.userName}}" data-id={{this._id}}>{{this.profile.userName}}</option>
+	        <option value="{{this.username}}" data-id={{this._id}}>{{this.username}}</option>
 	    {{/each}}
 	</select>
 </template>

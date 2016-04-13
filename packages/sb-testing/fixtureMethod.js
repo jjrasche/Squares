@@ -1,25 +1,3 @@
-// var resetDatabase = function resetDatabase() {
-//   // safety check
-//   if (!process.env.VELOCITY_TEST_PACKAGES) {
-//     throw new Meteor.Error(
-//       'NOT_ALLOWED',
-//       'velocityReset is not allowed outside of a mirror. Something has gone wrong.'
-//     );
-//   }
-
-//   var db = MongoInternals.defaultRemoteCollectionDriver().mongo.db;
-//   var collections = Meteor.wrapAsync(db.collections, db)();
-//   var appCollections = _.reject(collections, function (col) {
-//     return col.collectionName.indexOf('velocity') === 0
-//         || col.collectionName === 'system.indexes'
-//         // || col.collectionName === 'users';
-//   });
-
-//   _.each(appCollections, function (appCollection) {
-//     console.log('remove ' + appCollection.collectionName);
-//     Meteor.wrapAsync(appCollection.remove, appCollection)();
-//   });
-// };
 var clearDB = function clearDB(){
   console.log('Clear DB');
 
@@ -57,9 +35,6 @@ var resetTestingEnvironment = function resetTestingEnvironment(calledFrom) {
   console.log('resetTestingEnvironment called from: ' + calledFrom);
   if (process.env.VELOCITY_TEST_PACKAGES) {
     clearDB();
-    console.log('1 done')
-    // initializeFixutres();
-    console.log('2 done')
   } else {
     throw new Meteor.Error(
       'NOT_ALLOWED',

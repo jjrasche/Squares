@@ -19,9 +19,22 @@ Package.onUse(function (api) {
 
   // server and client files
   api.addFiles([
-    'lib/board.js',
-    'lib/meteorMethods.js'
+    'lib/board/baseFunctions.js'
+    ,'lib/board/staticMethods.js'
+    ,'lib/board/schema.js'
+    ,'lib/board/modificationFunctions.js'
+    ,'lib/meteorMethods.js'
   ], both);
+
+
+  // server only dependencies
+  api.use([
+  ], server);
+
+  // server only files
+  api.addFiles([
+    'server/publish.js'
+  ], server);
 
 
   // client only dependencies
@@ -33,8 +46,8 @@ Package.onUse(function (api) {
     'client/browser/sessionMethods.js'
     ,'client/browser/BoardPage/helper.html'
     ,'client/browser/BoardPage/style.css'
-  	,'client/browser/BoardPage/helper.js'  	
   	,'client/browser/BoardPage/layout.html'
+    ,'client/browser/BoardPage/helper.js'   
   	,'client/browser/BoardPage/route.js'  	
   ], client);
 });
@@ -44,6 +57,10 @@ Package.onTest(function (api) {
     , 'sanjo:jasmine@0.21.0'
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
+
+  api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
+  // api.addFiles('tests/jasmine/client/integration/boardPageTest.js', client);
+  api.export(['SB', 'Meteor']);
 });
 
 Npm.depends({

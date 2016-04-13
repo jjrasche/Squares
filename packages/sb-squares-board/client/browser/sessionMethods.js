@@ -10,7 +10,9 @@ gameIsSelected = function gameIsSelected(gameID) {
 	var selectedGames = Session.get('boardPageselectedGames');
 	return selectedGames.indexOf(gameID) != -1
 }
-squareContainsSelectedGame = function squareContainsSelectedGame(squareGames) {
+squareContainsSelectedGame = function squareContainsSelectedGame(matrix, x, y) {
+	if (!matrix) return false;
+	var squareGames = matrix[x][y];
 	for (var i = 0; i < squareGames.length; i++) {
 		if (gameIsSelected(squareGames[i]._id))
 			return true;

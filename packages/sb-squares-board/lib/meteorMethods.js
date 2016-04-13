@@ -3,12 +3,12 @@ HARDCODEDDEFAULTPASSWORD = "squares";
 
 // edit mode allows owners to select multiple squares and assign them to a single email 
 Meteor.methods({
-	createUserAndInvitation: function(boardID, email, userName, squares) {
+	createUserAndInvitation: function(boardID, email, username, squares) {
 		if (SB.debug) {
 			console.log("---- createUserAndInvitation ----");
 			console.log("boardID: ", boardID);
 			console.log("email: ", email);
-			console.log("userName: ", userName);
+			console.log("userName: ", username);
 			console.log("squares: ", squares);
 		}
 
@@ -18,13 +18,12 @@ Meteor.methods({
 			var userObject = {
 		        password: tempPassword,
 		        profile: {
-		          userName: userName,
 		          boardIDs: [boardID]
 		        },
-		        // username: userName
+		        username: username
 		    };
 		    if (email) userObject.email = email;
-		    else userObject.username = userName;
+		    else userObject.username = username;
 
 			var userID = Accounts.createUser(userObject);
 			Meteor.call('sendInvitation', boardID, userID, squares, tempPassword)
@@ -56,10 +55,10 @@ Meteor.methods({
 				var emailData = {
 					email: email,
 					password: tempPassword,
-					userName: user.profile.userName,
+					userName: user.username,
 					boardName: board.name ? board.name : 'boardName',
 					numSquares: squares.length,
-					boardOwner: boardOwner.profile.userName ? boardOwner.profile.userName : 'boardOwner',
+					boardOwner: boardOwner.username ? boardOwner.username : 'boardOwner',
 				};
 
 				// try to send invitation

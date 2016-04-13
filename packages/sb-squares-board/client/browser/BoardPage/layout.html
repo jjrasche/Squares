@@ -1,22 +1,21 @@
-<template name='boardPage'>
-	<div class="row">
-		<div class="col-xs-4">{{> editWidget}}</div>
-		<div class="col-xs-4">{{> BoardName}}</div>
-		<div class="col-xs-4">
-			{{>chapp_form}}  <!--{{> chatWindow}}-->
+<template name='sbSquaresBoardPage'>
+	<!-- {{#if Template.subscriptionsReady}} -->
+		<div class="row">
+			<div class="col-xs-4">{{> editWidget}}</div>
+			<div class="col-xs-4">{{> BoardName}}</div>
 		</div>
-	</div>
-	<div class="row sameHeightRow">
-		<div class="col-xs-2 nopadding" style="background-color: grey;">
-			{{> memberList}}
+		<div class="row sameHeightRow">
+			<div class="col-xs-2 nopadding" style="background-color: grey;">
+				{{> memberList}}
+			</div>
+			<div class="col-xs-8 nopadding sameHeightCol" style="background-color: grey">
+				{{> grid}}
+			</div>
+			<div class="col-xs-2 nopadding " style="background-color: grey">
+				{{> gameList}}
+			</div>
 		</div>
-		<div class="col-xs-8 nopadding sameHeightCol" style="background-color: grey">
-			{{> grid}}
-		</div>
-		<div class="col-xs-2 nopadding " style="background-color: grey">
-			{{> gameList}}
-		</div>
-	</div>
-<!-- 	{{> grid}}
- -->
+<!-- 	{{else}}
+		<div class="loading">{{>spinner}}</div>
+	{{/if}} -->
 </template>

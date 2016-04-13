@@ -61,8 +61,10 @@ SB.namespacer('SB.User', {model :
 _.extend(SB.User.model.prototype, {
   boards : function boards() {
     var boardIDs = this.profile.boardIDs; boardObjects = [];
+      console.log('boardIDs: ', boardIDs)
     for (var i = 0; i < boardIDs.length; i++) {
       var board = SB.Board.findOne(boardIDs[i])
+      console.log('board: ', boardIDs[i], board);
       boardObjects.push(board);
     }
     return boardObjects;
