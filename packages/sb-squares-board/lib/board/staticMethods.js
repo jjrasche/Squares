@@ -5,7 +5,7 @@ _.extend(SB.Board, {
     for (var i = 0; i < 10; i++) {
       for (var j = 0; j < 10; j++) {
         var key = this.getSquareKey(i,j);
-        board[key] = SQUARE_EMPTY_VALUE;
+        board[key] = SB.Board.const.SQUARE_EMPTY_VALUE;
       }
     }
     return board;

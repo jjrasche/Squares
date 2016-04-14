@@ -8,7 +8,6 @@ SB.namespacer('SB.User', {user :
 
 SB.namespacer('SB.User', {ID :
   function ID() {
-    if (Meteor.isServer) console.log('sdfljsdf');
     var userID = Meteor.isClient ? Meteor.userId() : this.userId();
     return userID;
     // if (user) return user._id;

@@ -8,7 +8,7 @@ _.extend(SB.Board.model.prototype, {
     var set = {};
 
     // if user not in board members, add her
-    if (!this.boardMember(newOwner)) {
+    if (!this.isMember(newOwner)) {
       var member = {
         _id: newOwner._id,
         numSquares: squaresToChange.length,
@@ -25,7 +25,7 @@ _.extend(SB.Board.model.prototype, {
       if (!this.canModifySquare(newOwner, x, y))
         throw new Meteor.Error("you do not have permission to change square (" + x + "," + y + ")");
 
-      if (this.userOccupiesSquare(newOwner, x, y)) {
+      if (this.memberOccupiesSquare(newOwner, x, y)) {
         releaseSquare(x, y);
       }else if (squareOccupied(x, y)) {
         releaseSquare(x, y);
@@ -36,7 +36,7 @@ _.extend(SB.Board.model.prototype, {
     }
 
     // If move gives user more squares than in board.members<user>.numSquares 
-    var newNumSquares = this.usersOccupiedSquares(newOwner).length;
+    var newNumSquares = this.memberOccupiedSquares(newOwner).length;
     if (this.getBoardMember(newOwner).numSquares < newNumSquares) {
       this.members = this.members.map(function(m) {
         if (m._id == newOwner._id) m.numSquares = newNumSquares;
@@ -48,7 +48,7 @@ _.extend(SB.Board.model.prototype, {
     SB.Board.update({_id: this._id}, {$set: set})
 
     function releaseSquare(x, y) {
-      changeSquare(x, y, SQUARE_EMPTY_VALUE);
+      changeSquare(x, y, SB.Board.const.SQUARE_EMPTY_VALUE);
     }
     function takeSquare(newOwner, x, y) {
       changeSquare(x, y, newOwner._id);
@@ -72,7 +72,7 @@ _.extend(SB.Board.model.prototype, {
     else {
       var numFreeSquares = getNumUserFreeSquares(board, user)
       // choosing empty square and have enough freeSquares
-      if (square == SQUARE_EMPTY_VALUE) {
+      if (square == SB.Board.const.SQUARE_EMPTY_VALUE) {
         if (numFreeSquares > 0) 
           return true;
         else 

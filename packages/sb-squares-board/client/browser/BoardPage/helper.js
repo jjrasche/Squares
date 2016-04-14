@@ -293,7 +293,7 @@ Template.invitePlayersModal.events({
                 {'emails.address': {$in: [null]}}, 
                 {'emails.address': {$exists: true}}]
         });
-        if (existingUser && board.boardMember(existingUser)) {
+        if (existingUser && board.isMember(existingUser)) {
             console.log("existingUser: ", existingUser);
             throw new Meteor.Error("User already on board, try re-assigning squares");
         }
@@ -476,8 +476,7 @@ Template.memberItem.helpers({
     },
     winnings: function(board) {
         if (this == "header") return "$";
-        var games = SB.Game.getGames([{finished: true}]);
-        var winnings = board.memberWinnings(games, this);
+        var winnings = board.memberWinnings(this);
         return winnings;
     },
     paid: function(board) {

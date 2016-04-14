@@ -5,11 +5,11 @@ Meteor.methods({
 		if (SB.debug) {
 			console.log("---- createBoard ----");
 			console.log("boardName: ", boardName);
-			console.log("userID: ", userID);
+			console.log("userID: ", userID, user._id);
 		}
 		if (!user) throw new Meteor.Error(SB.ErrMsg.INVALID_USER_ERROR);
 
-		board = {};
+		board = SB.Board.initializeBoard();
 		board.owners = [userID];
 		board.name = boardName;
 		board.members = [{

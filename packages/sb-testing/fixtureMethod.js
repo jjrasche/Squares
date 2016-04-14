@@ -1,6 +1,10 @@
+var Future = Npm.require("fibers/future");
+
+
 var clearDB = function clearDB(){
   console.log('Clear DB');
 
+  var future = new Future();
   var collectionsRemoved = 0;
   var db = Meteor.users.find()._mongo.db;
   db.collections(function (err, collections) {
@@ -13,20 +17,22 @@ var clearDB = function clearDB(){
     });
 
     // Remove each collection
-    _.each(appCollections, function (appCollection) {
+    _.each(appCollections, function (appCollection, idx) {
       appCollection.remove(function (e) {
         if (e) {
           console.error('Failed removing collection', e);
           fut.return('fail: ' + e);
         }
         collectionsRemoved++;
-        // console.log('Removed collection: ', appCollection.collectionName);
+        console.log('Removed collection: ', appCollection.collectionName, idx);
+        if (idx+1 === appCollections.length) future.return();
         if (appCollections.length === collectionsRemoved) {
           // console.log('Finished resetting database');
         }
       });
     });
   });
+  future.wait();
   console.log('Finished clearing');
 }
 
@@ -44,17 +50,9 @@ var resetTestingEnvironment = function resetTestingEnvironment(calledFrom) {
 };
 
 
-sleep = function sleep(milliseconds) {
-  var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > milliseconds){
-      break;
-    }
-  }
-}
-
 var initializeFixutres = function initializeFixutres() {
   var tester; tester2; board;
+
   // create users
   if (!SB.User.find().count()) {  
     tester = SB.User.fixture.formObject(SB.fixture.tester);
@@ -69,10 +67,13 @@ var initializeFixutres = function initializeFixutres() {
 
   // create board
   if (!SB.Board.find().count()) {
+    var future = new Future();
     Meteor.call('createBoard', 'testBoard', tester._id, function(err, res) {
       if (!err) board = SB.Board.findOne(res);
       else console.log(err);
+      future.return();
     });
+    future.wait();
     if (SB.debug) console.log(board);
   }
 

@@ -3,9 +3,6 @@ SB.namespacer('SB.ErrMsg', {INVALID_USER_ERROR : 'User not found'});
 SB.namespacer('SB.ErrMsg', {NOT_LOGGED_IN_ERROR : 'User not logged in'});
 SB.namespacer('SB.ErrMsg', {INVALID_BOARD_OWNER_ERROR : 'Board owner not found'});
 
-NUM_SQUARES = 100;
-SQUARE_EMPTY_VALUE = 'None';
-
 
 SB.namespacer('SB', {Board: 
   new Mongo.Collection('boards', {
@@ -14,7 +11,8 @@ SB.namespacer('SB', {Board:
     }
   })
 });
-
+SB.namespacer('SB.Board.const', {NUM_SQUARES : 100});
+SB.namespacer('SB.Board.const', {SQUARE_EMPTY_VALUE : 'None'});
 
 SB.namespacer('SB.Board', {model :
   function(doc) {
@@ -37,7 +35,7 @@ _.extend(SB.Board.model.prototype, {
         // else if (squareContainsInProgressGame(matrix[x][y])))          
         else if (squareContainsSelectedGame(matrix, x, y))
           color = 'blue';
-        else if (this.userOccupiesSquare(SB.User.user(), x, y)) 
+        else if (this.memberOccupiesSquare(SB.User.user(), x, y)) 
           color = 'orange';
         else if (this.squareIsEmpty(x, y))
           color = 'green';
@@ -48,8 +46,8 @@ _.extend(SB.Board.model.prototype, {
   },
   formatCellData : function formatCellData(x, y) {
     var cellData = this.getSquare(x,y)
-    if (cellData == SQUARE_EMPTY_VALUE) 
-      return SQUARE_EMPTY_VALUE; 
+    if (cellData == SB.Board.const.SQUARE_EMPTY_VALUE) 
+      return SB.Board.const.SQUARE_EMPTY_VALUE; 
     else {
       var user = SB.User.findOne(cellData);
       var ret = user.username;
@@ -60,7 +58,7 @@ _.extend(SB.Board.model.prototype, {
       return this[SB.Board.getSquareKey(x,y)];
   },
   squareIsEmpty : function squareIsEmpty(x, y) {
-    return this.getSquare(x,y) == SQUARE_EMPTY_VALUE;
+    return this.getSquare(x,y) == SB.Board.const.SQUARE_EMPTY_VALUE;
   },
   memberIDs : function memberIDs() { 
     return this.members.map(function(member) {
@@ -73,10 +71,10 @@ _.extend(SB.Board.model.prototype, {
   getMembers : function getMembers() { 
     return this.memberQuery().fetch();
   },  
-  numUnCommittedSquares : function getNumUnCommittedSquares() {
-    return NUM_SQUARES - this.getNumUnCommittedSquares();
+  numUnCommittedSquares : function numUnCommittedSquares() {
+    return SB.Board.const.NUM_SQUARES - this.numCommittedSquares();
   },
-  numCommittedSquares : function getNumCommittedSquares() {
+  numCommittedSquares : function numCommittedSquares() {
     var ret = 0
     var members = this.members;
     for (var i = 0; i < members.length; i++) {
@@ -90,22 +88,22 @@ _.extend(SB.Board.model.prototype, {
       }).length > 0;
     return ret;
   },
-  usersOccupiedSquares : function usersOccupiedSquares(user) {
+  memberOccupiedSquares : function memberOccupiedSquares(user) {
     var ret = [];
     for (var x = 0; x < 10; x++) {
       for (var y = 0; y < 10; y++) {
-        if (this.userOccupiesSquare(user, x, y))
+        if (this.memberOccupiesSquare(user, x, y))
           ret.push({x: x, y: y});
       }
     }
     return ret;
   },
-  userOccupiesSquare : function userOccupiesSquare(user, x, y) {
+  memberOccupiesSquare : function memberOccupiesSquare(user, x, y) {
     var square = this.getSquare(x,y);
     return square == user._id;
   },
 
-  boardMember : function boardMember(user) {
+  isMember : function isMember(user) {
     // if(!board || !user) return;
     var ret = this.members.filter(function(member) {
       return member._id == user._id;
@@ -113,17 +111,18 @@ _.extend(SB.Board.model.prototype, {
     return ret[0] ? ret[0] : false;
   },
   memberNumSquares : function memberNumSquares(user) {
-    var boardMember = this.boardMember(user);
+    var boardMember = this.isMember(user);
     return boardMember.numSquares;
   },
   memberPaid : function memberPaid(user) {
-    var boardMember = this.boardMember(user);
+    var boardMember = this.isMember(user);
     return boardMember.paid;
   },
-  memberWinnings : function memberWinnings(games, user) {
+  memberWinnings : function memberWinnings(user) {
     if (!this.locked) return 0;
+    var games = this.finishedGames();
 
-    var squares = this.usersOccupiedSquares(user);
+    var squares = this.memberOccupiedSquares(user);
     var matrix = this.gamesMatrix();
     var winnings = 0;
     for(var i = 0; i < squares.length; i++) {
@@ -133,8 +132,8 @@ _.extend(SB.Board.model.prototype, {
   },
 
   memberFreeSquares : function memberFreeSquares(user) {
-    return this.getUserTotalNumSquares(user) -
-        this.usersOccupiedSquares(user).length;
+    return this.memberNumSquares(user) -
+        this.memberOccupiedSquares(user).length;
   },
   squareOccupied : function squareOccupied(x, y) {
     var square = this.getSquare(x,y);
@@ -179,9 +178,13 @@ _.extend(SB.Board.model.prototype, {
   games : function games() {
     return this.gameQuery().fetch();
   },
-  gameQuery : function gameQuery() {
+  finishedGames : function games() {
+    return this.gameQuery([{finished: true}]).fetch();
+  },
+  gameQuery : function gameQuery(selector) {
     // TODO make this query specific to data from baord
-    var sort = {}; query = [{finished: true}, {date: {$gte: new Date(2016,01,01)}}];
+    var sort = {}; query = [{date: {$gte: new Date(2016,01,01)}}];
+    if (selector) query = query.concat(selector);
     var ret = SB.Game.find({$and: query}, {sort: sort});
     return ret;    
   },

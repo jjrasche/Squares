@@ -58,8 +58,11 @@ Package.onTest(function (api) {
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
 
-  api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
+  // api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
   // api.addFiles('tests/jasmine/client/integration/boardPageTest.js', client);
+  // api.addFiles('tests/jasmine/server/unit/boardCreationTest.js', server);
+  api.addFiles('tests/jasmine/server/unit/boardModelTest.js', server);
+
   api.export(['SB', 'Meteor']);
 });
 

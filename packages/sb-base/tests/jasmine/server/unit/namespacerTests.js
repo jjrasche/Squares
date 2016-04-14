@@ -23,6 +23,12 @@ describe("namespace", function(){
     expect(SB.test3.innerTest2).toEqual(2);
     expect(SB.test3.innerTest1).toEqual(1);
 
+    console.log('lsdfjasdf')
+    SB.namespacer('SB.Board.const', {TEST : 100});
+    SB.namespacer('SB.Board.const', {TEST2 : 100});
+    SB.namespacer('SB.Board.const', {TEST2 : 100});
+
+
     done();
   });
 

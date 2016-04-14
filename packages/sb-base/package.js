@@ -82,9 +82,12 @@ Package.onUse(function (api) {
 Package.onTest(function (api) {  
   api.use(['jjrasche:sb-base'
     , 'sanjo:jasmine@0.21.0'
+    // ,'jjrasche:sb-testing@0.0.1'
   ]);
 
-  api.addFiles('tests/jasmine/client/unit/namespacerTests.js', client);
+  api.addFiles('tests/jasmine/server/unit/namespacerTests.js', server);
+
+  api.export(['SB', 'Meteor']);
 });
 
 Npm.depends({
