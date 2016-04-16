@@ -47,4 +47,8 @@ Npm.depends({
   - templates are responsible for subscribing to needed data
   - attempt: make page level subscriptions in layout templates
   - use publish-composite to group all information needed by a single page
+
+  queries 
+  - SB.User.find({}, {sort: {['status.online': -1,username: -1]}}).fetch().map(function(u){ return u.username })
+  - SB.User.find({'status.lastLogin': {$exists: true}}, {sort: {'status.lastLogin.date': -1}}).map(function(u) { console.log(u.username + '  ' + u.status.lastLogin.date) })
 */

@@ -179,9 +179,7 @@ Template.grid.helpers({
                                     Session.set('boardPageselectedSquares', selectedSquares);
                                 }
                                 else {
-                                    Meteor.call('modifyBoard', board._id, SB.User.ID(), [{x,y}], function(err, res) {
-                                        if (err) handleServerError(err);
-                                    });
+                                    board.modifySquares(SB.User.ID(), [{x:x, y:y}]);
                                 }
                             }
                         }
@@ -293,7 +291,7 @@ Template.invitePlayersModal.events({
                 {'emails.address': {$in: [null]}}, 
                 {'emails.address': {$exists: true}}]
         });
-        if (existingUser && board.isMember(existingUser)) {
+        if (existingUser && board.member(existingUser)) {
             console.log("existingUser: ", existingUser);
             throw new Meteor.Error("User already on board, try re-assigning squares");
         }
@@ -305,7 +303,7 @@ Template.invitePlayersModal.events({
                 function(err, res) {
                     console.log("createUser callback: ", err, res);
                     if (err)
-                        handleServerError(err);
+                        SB.handleServerError(err);
                     userID = res
                 }
             );
@@ -316,7 +314,7 @@ Template.invitePlayersModal.events({
             Meteor.call('sendInvitation', boardID, userID, squares, 
                 function(err, res) {
                     if (err)
-                        handleServerError(err);
+                        SB.handleServerError(err);
                 });
         }
 
@@ -335,15 +333,12 @@ Template.assignSquaresModal.events({
     },
     'submit #assignSquareForm' : function(event) {
         event.preventDefault();
+        var board = this;
         var squares = Session.get('boardPageselectedSquares');
         var userID = $(event.target.members).find(':selected').data("id");
 
-        try {
-            Meteor.call('modifyBoard', this._id, userID, squares, function(err, res) {
-                if (err)
-                    handleServerError(err);
-            });
-        } catch (e) {}
+        board.modifySquares(userID, squares);
+
         Session.set('boardPageselectedSquares', []);
         Modal.hide('assignSquaresModal');
     }
@@ -361,7 +356,7 @@ Template.changeBoardOwnershipModal.events({
 
         Meteor.call('addOwner', this._id, userID, function(err, res) {
             if (err)
-                handleServerError(err);
+                SB.handleServerError(err);
         });
 
         Modal.hide('changeBoardOwnershipModal');
@@ -557,11 +552,6 @@ Template.registerHelper('boardPageEditButtonDisabled',
     }
 );
 
-
-handleServerError = function handleServerError(err) {
-    console.log(err);
-    alert(err);
-}
 
 Template.registerHelper('printThis',
     function(name) {

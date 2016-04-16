@@ -103,7 +103,7 @@ _.extend(SB.Board.model.prototype, {
     return square == user._id;
   },
 
-  isMember : function isMember(user) {
+  member : function member(user) {
     // if(!board || !user) return;
     var ret = this.members.filter(function(member) {
       return member._id == user._id;
@@ -111,11 +111,11 @@ _.extend(SB.Board.model.prototype, {
     return ret[0] ? ret[0] : false;
   },
   memberNumSquares : function memberNumSquares(user) {
-    var boardMember = this.isMember(user);
+    var boardMember = this.member(user);
     return boardMember.numSquares;
   },
   memberPaid : function memberPaid(user) {
-    var boardMember = this.isMember(user);
+    var boardMember = this.member(user);
     return boardMember.paid;
   },
   memberWinnings : function memberWinnings(user) {

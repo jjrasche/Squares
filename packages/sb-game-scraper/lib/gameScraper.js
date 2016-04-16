@@ -38,7 +38,7 @@ Meteor.methods({
 
       // 20150319  20150406 
       var future = new Future();
-      var startDate = new Date(), endDate = new Date();//"20150319".parseYYYYmmddDate();
+      var startDate = new Date(), endDate = new Date();
       if (start) startDate = start, endDate = start;
       if (end) endDate = end;
 

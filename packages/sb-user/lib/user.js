@@ -1,6 +1,7 @@
 SB.namespacer('SB.User', {user :
-  function user() {
-    var user = Meteor.isClient ? Meteor.user() : this.user();
+  function user(serverThis) {
+    var user = Meteor.user()
+    // console.log('SB.User.user()2', user);
     if (user) return new SB.User.model(user);
     else return null;
   }
@@ -8,10 +9,7 @@ SB.namespacer('SB.User', {user :
 
 SB.namespacer('SB.User', {ID :
   function ID() {
-    var userID = Meteor.isClient ? Meteor.userId() : this.userId();
-    return userID;
-    // if (user) return user._id;
-    // else return null;
+    return Meteor.userId();
   }
 });
 

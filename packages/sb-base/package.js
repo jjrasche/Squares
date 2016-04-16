@@ -32,8 +32,11 @@ Package.onUse(function (api) {
   api.addFiles([
     'lib/namespace.js'
     ,'lib/dateEnhancements.js'
+    ,'lib/arrayEnhancements.js'
+    ,'lib/numberEnhancements.js'
     ,'server/fixture.js'
     ,'lib/logging.js'
+    ,'lib/meteorMethods.js'
   ], both);
 
 

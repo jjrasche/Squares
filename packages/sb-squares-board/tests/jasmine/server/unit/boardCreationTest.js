@@ -38,7 +38,7 @@ describe("Board creation", function() {
     Meteor.call('createBoard', 't1', user._id, function(err, res) {
       var board = SB.Board.findOne(res);
       expect(board.isOwner(user)).toBeTruthy()
-      expect(board.isMember(user)).toBeTruthy()
+      expect(board.member(user)).toBeTruthy()
       done();
     })
   });
