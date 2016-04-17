@@ -278,45 +278,13 @@ Template.invitePlayersModal.events({
     },
     'submit #invitePlayerForm' : function(event) {
         event.preventDefault();
+        var board = this; boardID = board._id;
         var squares = Session.get('boardPageselectedSquares');
         var email = event.target.email.value == '' ? null : event.target.email.value;
         var username = event.target.username.value;
-        var board = this;
-        var boardID = board._id;
-        var userID;
         console.log("submit #invitePlayerForm  this: ", this, username, email);
 
-        // if email address is attached to user and user already a member, error
-        var existingUser = SB.User.findOne({$and: [
-                {'emails.address': {$in: [null]}}, 
-                {'emails.address': {$exists: true}}]
-        });
-        if (existingUser && board.member(existingUser)) {
-            console.log("existingUser: ", existingUser);
-            throw new Meteor.Error("User already on board, try re-assigning squares");
-        }
-
-        // create user if doesn't exist
-        if (!existingUser) {
-            console.log("inserting new user",  boardID, email, username, squares);
-            Meteor.call('createUserAndInvitation', boardID, email, username, squares, 
-                function(err, res) {
-                    console.log("createUser callback: ", err, res);
-                    if (err)
-                        SB.handleServerError(err);
-                    userID = res
-                }
-            );
-        }
-        else {
-            console.log("found existing user: ", existingUser);
-            userID = existingUser._id;
-            Meteor.call('sendInvitation', boardID, userID, squares, 
-                function(err, res) {
-                    if (err)
-                        SB.handleServerError(err);
-                });
-        }
+        board.invitePlayer(email, username, squares);
 
         Session.set('boardPageselectedSquares', []);
         Modal.hide('invitePlayersModal');

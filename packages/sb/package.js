@@ -13,8 +13,8 @@ Package.onUse(function (api) {
   api.imply([
     'jjrasche:sb-base'
     ,'jjrasche:sb-game-scraper'        
-    ,'jjrasche:sb-squares-board'    
     ,'jjrasche:sb-user'    
+    ,'jjrasche:sb-squares-board'    
     ,'jjrasche:sb-portal'
   ], both);
 

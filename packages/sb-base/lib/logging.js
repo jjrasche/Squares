@@ -3,7 +3,7 @@ SB.namespacer('SB', {debug: true});
 SB.namespacer('SB', {handleServerError : 
 	function handleServerError(err) {
     	console.log("handleServerError: ", err);
-    	alert(err);
+    	if (Meteor.isClient) alert(err);
     }
 });
 

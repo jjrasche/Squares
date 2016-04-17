@@ -65,6 +65,9 @@ _.extend(SB.Board.model.prototype, {
       return member._id;
     });
   },
+  memberID : function memberID(ID) { 
+    return this.memberIDs().indexOf(ID) !== -1;
+  },
   memberQuery : function memberQuery() { 
     return SB.User.find({_id: {$in: this.memberIDs()}})
   },

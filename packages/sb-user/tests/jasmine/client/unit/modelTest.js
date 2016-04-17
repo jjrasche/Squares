@@ -1,6 +1,6 @@
 describe("User model functionality Client", function() {
     beforeAll(function(done) {
-      Meteor.call('resetTestingEnvironment', 'portalTestPage.js', function(err, res) {
+      Meteor.call('resetTestingEnvironment', 'userServerModelTests.js', function(err, res) {
         console.log('resetTestingEnvironment: ', err, res);
         done();
       });

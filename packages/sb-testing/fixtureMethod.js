@@ -66,14 +66,13 @@ var initializeFixutres = function initializeFixutres() {
   }
 
   // create board
+  var future = new Future();
   if (!SB.Board.find().count()) {
-    var future = new Future();
     Meteor.call('createBoard', 'testBoard', tester._id, function(err, res) {
       if (!err) board = SB.Board.findOne(res);
       else console.log(err);
       future.return();
     });
-    future.wait();
     if (SB.debug) console.log(board);
   }
 
@@ -86,6 +85,7 @@ var initializeFixutres = function initializeFixutres() {
     }
     if (SB.debug) console.log(games[0]);
   }
+  future.wait();
 }
 
 Meteor.methods({

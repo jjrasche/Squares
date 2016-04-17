@@ -20,11 +20,11 @@ Package.onUse(function (api) {
     ,'mongo'
     ,'email'
     ,'random'
-    // ,'meteorhacks:ssr'
     ,'aldeed:collection2'
     ,'aldeed:autoform'
     // ,'autopublish'
     ,'check'
+    ,'blaze-html-templates'
   ];
   api.use(packages, both);
   api.imply(packages, both);
@@ -54,7 +54,7 @@ Package.onUse(function (api) {
   // client only dependencies
   packages = [
     'tracker'
-    ,'blaze-html-templates'
+    // ,'blaze-html-templates'
     ,'session'
     ,'standard-minifiers'
     ,'es5-shim'

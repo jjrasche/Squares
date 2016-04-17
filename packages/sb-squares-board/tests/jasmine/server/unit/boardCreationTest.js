@@ -1,7 +1,7 @@
 describe("Board creation", function() {
   // reset DB
   beforeAll(function(done) {
-    Meteor.call('resetTestingEnvironment', 'portalTestPage.js', function(err, res) {
+    Meteor.call('resetTestingEnvironment', 'boardCreation.js', function(err, res) {
       done();
     });
   });

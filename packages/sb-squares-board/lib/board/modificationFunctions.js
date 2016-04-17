@@ -4,14 +4,10 @@
     because need to do validation on it when all changes complete.
   */
 _.extend(SB.Board.model.prototype, {
-  modifySquares : function modifySquares(userID, squares) {
+  modifySquares : function modifySquares(userID, squares, callback) {
     try {
-      Meteor.call('modifySquares', this._id, SB.User.ID(), squares, 
-        function(err, res) {
-          // console.log("clicked square: ", err, res);
-          if (err) SB.handleServerError(err);
-        }
-      );
+      callback = setGenericCallbackIfUndefined(callback, 'modifySquares');
+      Meteor.call('modifySquares', this._id, userID, squares, callback);
     }
     catch (ex) {
       SB.handleClientError(ex)
@@ -20,7 +16,10 @@ _.extend(SB.Board.model.prototype, {
   lock : function lock() {
     
   }, 
-
+  invitePlayer : function invitePlayer(email, username, squares, callback) {
+    callback = setGenericCallbackIfUndefined(callback, 'modifySquares');
+    Meteor.call('inviteUser', this._id, email, username, squares, callback);
+  },
   canModifySquare : function canModifySquare(user, x, y) {
     // console.log('canModifySquare: ', this);
     var square = this.getSquare(x,y);
@@ -51,3 +50,15 @@ _.extend(SB.Board.model.prototype, {
     }
   }
 });
+
+
+var setGenericCallbackIfUndefined = function setGenericCallbackIfUndefined(callback, func) {
+  if (!callback) {
+    return function(err, res) {
+        console.log(func + ": ", err, res);
+        if (err) SB.handleServerError(err);
+      }
+
+  }
+  else return callback;
+}

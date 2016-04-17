@@ -1,8 +1,38 @@
 HARDCODEDDEFAULTPASSWORD = "squares";
-
+if (Meteor.isServer) {
+	Future = Npm.require("fibers/future");
+}
 
 // edit mode allows owners to select multiple squares and assign them to a single email 
 Meteor.methods({
+	inviteUser: function inviteUser(boardID, email, username, squares) {
+		var board = SB.Board.findOne(boardID);
+		if (SB.debug) {
+			console.log("---- createUserAndInvitation ----");
+			console.log("boardID: ", boardID);
+			console.log("email: ", email);
+			console.log("userName: ", username);
+			console.log("squares: ", squares);
+			console.log("---------------------------------");
+		}
+		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+
+		if (Meteor.isServer) {
+		    // if email address is attached to user and user already a member, cannot add
+		    var existingUserID = Meteor.call('findUserByEmail', email);
+		    if (existingUserID && board.memberID(existingUserID))
+		        throw new Meteor.Error("User already on board, try re-assigning squares");
+
+		    if (existingUserID) {
+		      console.log("found existing user: ", existingUserID);
+		      Meteor.call('sendInvitation', boardID, existingUserID, squares);
+		    }
+		    else {
+		      console.log("inserting new user",  boardID, email, username, squares);
+		      Meteor.call('createUserAndInvitation', boardID, email, username, squares);
+		    }
+		}
+	},
 	createUserAndInvitation: function createUserAndInvitation(boardID, email, username, squares) {
 		if (SB.debug) {
 			console.log("---- createUserAndInvitation ----");
@@ -10,6 +40,7 @@ Meteor.methods({
 			console.log("email: ", email);
 			console.log("userName: ", username);
 			console.log("squares: ", squares);
+			console.log("---------------------------------");
 		}
 
 		if (Meteor.isServer) {
@@ -17,9 +48,6 @@ Meteor.methods({
 			var tempPassword = email ? Random.hexString(5) : HARDCODEDDEFAULTPASSWORD;
 			var userObject = {
 		        password: tempPassword,
-		        profile: {
-		          boardIDs: [boardID]
-		        },
 		        username: username
 		    };
 		    if (email) userObject.email = email;
@@ -42,6 +70,7 @@ Meteor.methods({
 			console.log("userID, email: ", userID, email);
 			console.log("squares: ", squares);
 			console.log("tempPassword: ", tempPassword);
+			console.log("---------------------------------");
 		}
 		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
@@ -51,7 +80,8 @@ Meteor.methods({
 
 		if (Meteor.isServer) {
 			if (email) {
-				SSR.compileTemplate('invitationEmailHTML', Assets.getText( 'invitationEmail.html' ) );
+				console.log('sendInvitation: ', Assets);
+				SSR.compileTemplate('invitationEmailHTML', emailInvitationTemplate);//Assets.getText( '/packages/jjrasche_sb-squares-board/private/invitationEmail.html' ) );
 				var emailData = {
 					email: email,
 					password: tempPassword,
@@ -69,10 +99,14 @@ Meteor.methods({
 			      html: SSR.render('invitationEmailHTML', emailData)
 			    })
 			}
-			Meteor.call('modifyBoard', boardID, userID, squares, function(err, res) {
+			
+			user.update({$set : {'profile.boardIDs' : user.profile.boardIDs.concat([boardID])}});
+
+			Meteor.call('modifySquares', boardID, userID, squares, function(err, res) {
 				if (err) 
 					throw err;
 			});
+		
 		}
 	},
 	modifySquares: function modifySquares(boardID, userID, squares) {
@@ -83,8 +117,9 @@ Meteor.methods({
 		if (SB.debug) {
 			console.log("---- modifySquares ----");
 			console.log("board: ", board ? board._id : board);
-			console.log("newOwner ", newOwner ? newOwner._id : newOwner);
+			console.log("newOwner: ", newOwner ? newOwner._id : newOwner);
 			console.log("squares: ", squares);
+			console.log("---------------------------------");
 		}
 		if (!SB.User.user()) SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
@@ -153,6 +188,7 @@ Meteor.methods({
 			console.log("---- addOwner ----");
 			console.log("boardID: ", boardID);
 			console.log("userID: ", userID);
+			console.log("---------------------------------");
 		}
 		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
@@ -173,6 +209,7 @@ Meteor.methods({
 		if (SB.debug) {
 			console.log("---- randomizeBoardNumbers ----");
 			console.log("boardID: ", boardID);
+			console.log("---------------------------------");
 		}
 		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
@@ -199,6 +236,36 @@ Meteor.methods({
 
 
 
+/*
+	war7 failing to add static assets in package architecture. This is a work around
+	until I can upgrade to 1.3.
+	tried a bunch of things
+	http://stackoverflow.com/questions/24143504/meteor-package-how-to-add-static-files   
+	https://github.com/meteor/meteor/issues/5998
+*/
+var emailInvitationTemplate = 
+"<html xmlns=\"http://www.w3.org/1999/xhtml\">"
++ "	<head>\n"
++ "		<meta name=\"viewport\" content=\"width=device-width\" />\n"
++ "		<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
++ "		<title>Invitation to {{boardName}} NCAA squares game</title>\n"
++ "		<link href=\"styles.css\" media=\"all\" rel=\"stylesheet\" type=\"text/css\" />\n"
++ "	</head>\n"
++ "\n"
++ "	<body itemscope itemtype=\"http://schema.org/EmailMessage\">\n"
++ "		Hello {{userName}}, <br>\n"
++ "		{{boardOwner}} has selected {{numSquares}} squares for you on \n"
++ "		{{boardName}}\'s\' NCAA squares game. <br>\n"
++ "		You can:\n"
++ "		<ol>\n"
++ "			<li>track game scores</li>\n"
++ "			<li>change squares</li>\n"
++ "			<li>and chat with other members</li>\n"
++ "		</ol>\n"
++ "		login with email: {{email}} and temporaryPassword: {{password}}\n"
++ "		<a href=\"squares.webhop.me/\">squares.webhop.me</a>\n"
++ "	</body>\n"
++ "</html>\n"
 
 
 

@@ -12,12 +12,17 @@ Package.onUse(function (api) {
   // server and client dependencies
   api.use([
     'jjrasche:sb-base'
+    ,'jjrasche:sb-user'
   ], both);
   api.imply([
     'jjrasche:sb-base'
+    ,'jjrasche:sb-user'
   ], both);
 
   // server and client files
+  // api.addFiles(['lib/inviationEmail.html'], server) // meteor methods need this
+  //api.addFiles(['/private/inviationEmail.html'], server, {isAsset: true});//
+  // api.addFiles('/private/inviationEmail.html', server, [{isAsset: true}, {lazy: true}])
   api.addFiles([
     'lib/board/baseFunctions.js'
     ,'lib/board/staticMethods.js'
@@ -29,6 +34,8 @@ Package.onUse(function (api) {
 
   // server only dependencies
   api.use([
+    'templating'
+    ,'meteorhacks:ssr@2.2.0'
   ], server);
 
   // server only files
@@ -58,10 +65,10 @@ Package.onTest(function (api) {
     ,'jjrasche:sb-testing@0.0.1'    // debug only so only compiled when Testing
   ]);
 
-  // api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
-  // api.addFiles('tests/jasmine/client/integration/boardPageTest.js', client);
+  api.addFiles('tests/jasmine/client/integration/wait_for_router_helper.js', client);
+  api.addFiles('tests/jasmine/client/integration/boardPageFunctionalTest.js', client);
   // api.addFiles('tests/jasmine/server/unit/boardCreationTest.js', server);
-  api.addFiles('tests/jasmine/server/unit/boardModelTest.js', server);
+  // api.addFiles('tests/jasmine/server/unit/boardModelTest.js', server);
 
   api.export(['SB', 'Meteor']);
 });

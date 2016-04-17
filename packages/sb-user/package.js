@@ -21,8 +21,9 @@ Package.onUse(function (api) {
 
   // client only files
   api.addFiles([
-    'lib/user.js',
-    'server/fixture.js'
+    'lib/user.js'
+    ,'server/fixture.js'
+    ,'lib/meteorMethods.js'
   ], both);
 
 
@@ -45,6 +46,8 @@ Package.onUse(function (api) {
   api.addFiles([
     'client/config.accounts.js'
   ], client);
+
+  api.export(['Accounts']);
 });
 
 Package.onTest(function (api) {
@@ -57,7 +60,7 @@ Package.onTest(function (api) {
   // api.addFiles('tests/jasmine/client/unit/fixtureTest.js', client);
   api.addFiles('tests/jasmine/client/unit/modelTest.js', client);
   api.addFiles('tests/jasmine/server/unit/modelTest.js', server);
-  api.export(['SB', 'Meteor']);
+  api.export(['SB', 'Meteor', 'Accounts']);
 });
 
 

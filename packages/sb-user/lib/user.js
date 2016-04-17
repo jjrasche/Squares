@@ -48,6 +48,7 @@ SB.namespacer('SB.User', {find :
   }
 });
 
+
 SB.namespacer('SB.User', {model :
   function(doc) {
     _.extend(this, doc);
@@ -57,14 +58,27 @@ SB.namespacer('SB.User', {model :
 // instance methods
 _.extend(SB.User.model.prototype, {
   boards : function boards() {
-    var boardIDs = this.profile.boardIDs; boardObjects = [];
-      console.log('boardIDs: ', boardIDs)
-    for (var i = 0; i < boardIDs.length; i++) {
-      var board = SB.Board.findOne(boardIDs[i])
-      console.log('board: ', boardIDs[i], board);
-      boardObjects.push(board);
-    }
-    return boardObjects;
+    return SB.Board.find({_id: {$in: this.profile.boardIDs}}).fetch();
+  },
+  // TODO add programatically to all models
+  update : function update(modifier) {
+    Meteor.users.update({_id: this._id}, modifier, function(err, res) {
+      if (err) throw err;
+      else return res;
+    });
+  }
+});
+
+// static methods
+_.extend(SB.User, {
+  exists : function exists(email) {
+    var ret
+    Meteor.call('findUserByEmail', email, function(err, res) {
+      if (err) throw err;
+      console.log('findUserByEmail: ', err, res, (res != undefined));
+      ret = res != undefined;
+    });
+    return ret
   }
 });
 
