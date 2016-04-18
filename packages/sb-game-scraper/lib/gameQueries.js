@@ -22,8 +22,8 @@ SB.namespacer('SB.Game.query.function', { exists :
       {'homeTeam.name': game.homeTeam.name},
       {'awayTeam.name': game.awayTeam.name},
       {'date': {
-        $gte: game.date.getClearedTimeOfDateTime(),
-        $lte: game.date.getMaxTimeOfDateTime()
+        $gte: game.date.clearTime(),
+        $lte: game.date.maxTime()
       }}
     ];
   }

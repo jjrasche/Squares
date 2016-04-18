@@ -36,4 +36,8 @@ Package.onTest(function (api) {
 });
 
 Npm.depends({
+  fibers : '1.0.10'
+  ,request : '2.72.0'
+  ,cheerio : '0.20.0'
+  ,
 });
