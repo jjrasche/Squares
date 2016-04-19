@@ -66,7 +66,7 @@ describe("Board page funcitonal tests", function() {
     var user = SB.User.user();
     var board = user.boards()[0];
     var origNumSquares = board.memberNumSquares(user);
-    var squares = [{x: 1, y: 1}];
+    var squares = [{x: 1, y: 1}, {x: 1, y: 2}];
 
     board.modifySquares(user._id, squares, function(err, res) {
       board = user.boards()[0];
@@ -84,7 +84,7 @@ describe("Board page funcitonal tests", function() {
   });  
 
 
-  it('Invite a board member', function(done) {
+  it('Invite an existing user board member', function(done) {
     var invitee = SB.fixture.tester2;
     var user = SB.User.user();
     var board = user.boards()[0];
@@ -103,6 +103,30 @@ describe("Board page funcitonal tests", function() {
       for (var i = 0; i < squares.length; i++) {
         var squareKey = SB.Board.getSquareKey(squares[i].x, squares[i].y);
         expect(board[squareKey]).toEqual(invitee._id);
+      }
+      done();
+    });
+  });  
+
+  var newUser = {email:'test4@test.com', username:'tester4', password:'tttttt'};
+  it('Invite an new user board member by email', function(done) {
+    var owner = SB.User.user();
+    var board = owner.boards()[0];
+    var squares = [{x: 9, y: 9}];
+
+    // add member without giving any squares
+    board.invitePlayer(newUser.email, newUser.username, squares, function(err, res) {
+      board = owner.boards()[0];
+      newUser = SB.User.findOne({username: newUser.username});
+
+      expect(newUser).toBeDefined();
+      expect(err).toBeUndefined();
+
+      expect(board.memberNumSquares(newUser)).toEqual(squares.length);
+      expect(board.member(newUser)).toBeTruthy(); 
+      for (var i = 0; i < squares.length; i++) {
+        var squareKey = SB.Board.getSquareKey(squares[i].x, squares[i].y);
+        expect(board[squareKey]).toEqual(newUser._id);
       }
       done();
     });
@@ -133,6 +157,27 @@ describe("Board page funcitonal tests", function() {
     });
   });  
 
+  it('owner unable to assign more squares than exist', function(done) {
+    var owner = SB.User.user();
+    var invitee = SB.User.findOne({username: SB.fixture.tester2.username});
+    var board = owner.boards()[0];
+    var origOwnerNumSquares = board.memberNumSquares(owner);
+    var origInviteeNumSquares = board.memberNumSquares(invitee);
+    var squares = [];
+    for (var x = 0; x < 10; x++) {
+      for (var y = 0; y < 10; y++) {
+        squares.push({x:x, y:y});
+      }
+    }
+
+    board.modifySquares(owner._id, squares, function(err, res) {
+      board = owner.boards()[0];
+      console.log('owner unable to assign more squares than exist: ', err);
+      expect(err).toBeDefined();
+      done();
+    });
+  }); 
+
 
 
   describe('prevent logic', function() {
@@ -151,11 +196,19 @@ describe("Board page funcitonal tests", function() {
     it('non-owner cannot take non-empty square', function(done) {
       var user = SB.User.user();
       var board = user.boards()[0];
+      var origUserNumSquares = board.memberNumSquares(user);
       var squares = [{x: 2, y: 2}];
 
       // add member without giving any squares
       board.modifySquares(user._id, squares, function(err, res) {
         expect(err).toBeDefined();
+        // didn't add any squares
+        expect(board.memberNumSquares(user)).toEqual(origUserNumSquares);
+        for (var i = 0; i < squares.length; i++) {
+          var squareKey = SB.Board.getSquareKey(squares[i].x, squares[i].y);
+          expect(board[squareKey]).not.toEqual(user._id);
+        }        
+      
         done();
       });
     });  
@@ -163,30 +216,44 @@ describe("Board page funcitonal tests", function() {
     it('non-owner can take empty square', function(done) {
       var user = SB.User.user();
       var board = user.boards()[0];
+      var origUserNumSquares = board.memberNumSquares(user);
       var squares = [{x: 1, y: 1}];
       // add member without giving any squares
       board.modifySquares(user._id, squares, function(err, res) {
         board = user.boards()[0];
         expect(err).toBeUndefined();
 
-        // as user removed 1 square, she has 1 square unclaimed on board to use.
-        expect(board.memberNumSquares(user)).toEqual(origOwnerNumSquares); 
+        // should not get more squares than originally started with
+        expect(board.memberNumSquares(user)).toEqual(origUserNumSquares);
         for (var i = 0; i < squares.length; i++) {
           var squareKey = SB.Board.getSquareKey(squares[i].x, squares[i].y);
           expect(board[squareKey]).toEqual(user._id);
         }
         done();
       });
-    });   
+    });
+
+    it('non-owner can remove own square', function(done) {
+      var user = SB.User.user();
+      var board = user.boards()[0];
+      var origUserNumSquares = board.memberNumSquares(user);
+      var squares = [{x: 1, y: 1}];
+      // add member without giving any squares
+      board.modifySquares(user._id, squares, function(err, res) {
+        board = user.boards()[0];
+        expect(err).toBeUndefined();
+
+        // should not get more squares than originally started with
+        expect(board.memberNumSquares(user)).toEqual(origUserNumSquares);
+        for (var i = 0; i < squares.length; i++) {
+          var squareKey = SB.Board.getSquareKey(squares[i].x, squares[i].y);
+          expect(board[squareKey]).toEqual(SB.Board.const.SQUARE_EMPTY_VALUE);
+        }
+        done();
+      });
+    });      
   });
 
-
-  // it("simple", function(done) {
-  //   console.log(testing);
-  //   //expect($('.sbPortalUsersBoard').length).toEqual(0);
-  //   except(0).toEqual(1);
-  //   done();
-  // });
 
 }); 
 

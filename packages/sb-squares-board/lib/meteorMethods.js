@@ -15,7 +15,7 @@ Meteor.methods({
 			console.log("squares: ", squares);
 			console.log("---------------------------------");
 		}
-		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
 
 		if (Meteor.isServer) {
 		    // if email address is attached to user and user already a member, cannot add
@@ -72,10 +72,10 @@ Meteor.methods({
 			console.log("tempPassword: ", tempPassword);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
-		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
-		if (!user) throw new SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
-		if (!boardOwner) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_OWNER_ERROR);
+		if (!SB.User.user()) SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!user) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
+		if (!boardOwner) SB.Error(SB.ErrMsg.INVALID_BOARD_OWNER_ERROR);
 
 
 		if (Meteor.isServer) {
@@ -141,7 +141,7 @@ Meteor.methods({
 			var x = squares[i].x; 
 			var y = squares[i].y;
 			if (!board.canModifySquare(newOwner, x, y))
-				throw new SB.Error("you do not have permission to change square (" + x + "," + y + ")");
+				SB.Error("you do not have permission to change square (" + x + "," + y + ")");
 			if (board.memberOccupiesSquare(newOwner, x, y)) {
 				releaseSquare(x, y);
 			}else if (board.squareOccupied(x, y)) {
@@ -152,13 +152,47 @@ Meteor.methods({
 			}
 		}
 
+		/*
+			---- Compare methods of tracking allotted squares ----
+			source of truth of allotted squares:
+			1) member's numSquares  ******* 
+				Pro:
+					- Honors previous square allotments. Forcing owner to manually 
+					  change a member's # squares to fix a mistake
+				Con: 
+					- if a user was mistakenly given more squares than intended,
+					  it would be take some research to find who it was and decrease
+					  that user's # squares to fix the mistake. A similar maneuver
+					  would have to be taken for mistakes with approach 2, just
+					  by finding users with unassigned squares.
+			2) board
+				Pro:
+					- Owner has more freedom, but can more easily get into trouble.
+				Con: 
+					- need a way of keeping total # alloted squares under max 
+					  anyways. Scenario: member removes only square to reposition,
+					  before the member takes the other square, the owner assigns
+					  all remaining squares to another member. Then the first
+					  member will have 1 alloted square and no place to put it. 
+
+			Going with approach 1 as it protects the original agreement with member, 
+			and prevents the graver more easily compounded mistake of overassigning.
+		*/
 		// if action gives user more squares than originally had, increase user's squares
-		var newNumSquares = board.memberOccupiedSquares(newOwner).length;
-		if (board.memberNumSquares(newOwner) < newNumSquares) {
+		var numMemberSquaresOnBoard = board.memberOccupiedSquares(newOwner).length;
+		var numMemberAllocatedSquares = board.memberNumSquares(newOwner);		
+		if (numMemberAllocatedSquares < numMemberSquaresOnBoard) {
 			board.members = board.members.map(function(m) {
-				if (m._id == newOwner._id) m.numSquares = newNumSquares;
+				if (m._id == newOwner._id) m.numSquares = numMemberSquaresOnBoard;
 					return m; 
 			});
+			if (board.numAssignedSquares() > SB.Board.const.NUM_SQUARES) {
+				throw SB.Error('Move would assign ' + 
+								(numMemberSquaresOnBoard - numMemberAllocatedSquares)
+								+ ' more squares to ' + newOwner.username
+								+ ' putting the total number of assigned squares at '
+								+ board.numAssignedSquares())
+			}
 			set.members = board.members;
 		}
 
@@ -170,14 +204,14 @@ Meteor.methods({
 
 
 		function releaseSquare(x, y) {
-		changeSquare(x, y, SB.Board.const.SQUARE_EMPTY_VALUE);
+			changeSquare(x, y, SB.Board.const.SQUARE_EMPTY_VALUE);
 		}
 		function takeSquare(newOwner, x, y) {
-		changeSquare(x, y, newOwner._id);
+			changeSquare(x, y, newOwner._id);
 		}
 		function changeSquare(x, y, val) {
-		var key = SB.Board.getSquareKey(x, y);
-		board[key] = set[key] = val
+			var key = SB.Board.getSquareKey(x, y);
+			board[key] = set[key] = val
 		}	
 	},
 	addOwner: function addOwner(boardID, userID) {
@@ -190,10 +224,10 @@ Meteor.methods({
 			console.log("userID: ", userID);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
-		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
-		if (!newOwner) throw new SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
-		if (!board.isOwner(SB.User.user())) throw new SB.Error("Only owners can add an owner.");
+		if (!SB.User.user())	SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!newOwner) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
+		if (!board.isOwner(SB.User.user())) SB.Error("Only owners can add an owner.");
 
 		// do not add an owner twice
 		if (board.isOwner(newOwner))
@@ -211,9 +245,9 @@ Meteor.methods({
 			console.log("boardID: ", boardID);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user())	throw new SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
-		if (!board) throw new SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
-		if (!board.isOwner(SB.User.user())) throw new SB.Error("Only owners can add an owner.");
+		if (!SB.User.user())	SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!board.isOwner(SB.User.user())) SB.Error("Only owners can add an owner.");
 
 		if (!board.locked) {
 			SB.Board.update({_id: boardID},{$set: {

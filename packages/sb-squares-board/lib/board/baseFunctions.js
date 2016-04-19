@@ -86,12 +86,14 @@ _.extend(SB.Board.model.prototype, {
     return ret;
   },
   isOwner : function isOwner(user) {
+    if(!user) return;
     var ret = this.owners.filter(function(m) { 
         return m == user._id
       }).length > 0;
     return ret;
   },
   memberOccupiedSquares : function memberOccupiedSquares(user) {
+    if(!user) return;
     var ret = [];
     for (var x = 0; x < 10; x++) {
       for (var y = 0; y < 10; y++) {
@@ -107,21 +109,24 @@ _.extend(SB.Board.model.prototype, {
   },
 
   member : function member(user) {
-    // if(!board || !user) return;
+    if(!user) return;
     var ret = this.members.filter(function(member) {
       return member._id == user._id;
     });
     return ret[0] ? ret[0] : false;
   },
   memberNumSquares : function memberNumSquares(user) {
+    if(!user) return;
     var boardMember = this.member(user);
     return boardMember.numSquares;
   },
   memberPaid : function memberPaid(user) {
+    if(!user) return;
     var boardMember = this.member(user);
     return boardMember.paid;
   },
   memberWinnings : function memberWinnings(user) {
+    if(!user) return;
     if (!this.locked) return 0;
     var games = this.finishedGames();
 
@@ -134,7 +139,8 @@ _.extend(SB.Board.model.prototype, {
     return winnings;
   },
 
-  memberFreeSquares : function memberFreeSquares(user) {
+  memberNumFreeSquares : function memberNumFreeSquares(user) {
+    if(!user) return;
     return this.memberNumSquares(user) -
         this.memberOccupiedSquares(user).length;
   },
@@ -152,6 +158,17 @@ _.extend(SB.Board.model.prototype, {
       score += board.gamePoints(game);
     });
     return score;
+  },
+
+  numFreeSquares : function numFreeSquares() {
+    return SB.Board.const.NUM_SQUARES - this.numAssignedSquares();
+  },
+  numAssignedSquares : function numAssignedSquares() {
+    var ret = 0;
+    this.members.map(function(m) {
+      ret += m.numSquares;
+    })
+    return ret;
   },
   // getSquareOwner = function getSquareOwner(board, x, y) {
   //   var square = board.getSquare(x,y);

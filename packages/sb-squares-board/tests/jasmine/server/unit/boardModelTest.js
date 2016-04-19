@@ -34,7 +34,7 @@ describe("Board instance methods", function() {
     });    
     
     it('member has no squares assigned', function() {
-      expect(board.memberFreeSquares(owner)).toEqual(0);
+      expect(board.memberNumFreeSquares(owner)).toEqual(0);
     });   
 
   });

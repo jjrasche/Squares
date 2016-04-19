@@ -21,7 +21,6 @@ _.extend(SB.Board.model.prototype, {
     Meteor.call('inviteUser', this._id, email, username, squares, callback);
   },
   canModifySquare : function canModifySquare(user, x, y) {
-    // console.log('canModifySquare: ', this);
     var square = this.getSquare(x,y);
     if (this.locked) 
       throw new Meteor.Error("board is locked, must unlock to make changes");
@@ -29,12 +28,11 @@ _.extend(SB.Board.model.prototype, {
     if (this.isOwner(user)) {
       return true;
     }
-    // non-owners can remove self from squares and add self to empty squares
-    else {
-      var numFreeSquares = this.memberFreeSquares(user)
+    else {  // non-owners can remove self from squares and add self to empty squares
+      var numMemberFreeSquares = this.memberNumFreeSquares(user)
       // choosing empty square and have enough freeSquares
       if (square == SB.Board.const.SQUARE_EMPTY_VALUE) {
-        if (numFreeSquares > 0) 
+        if (numMemberFreeSquares > 0) 
           return true;
         else 
           throw new Meteor.Error("All " + this.memberNumSquares(user) +
