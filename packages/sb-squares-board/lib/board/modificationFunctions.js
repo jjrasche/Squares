@@ -13,11 +13,12 @@ _.extend(SB.Board.model.prototype, {
       SB.handleClientError(ex)
     }
   },
-  lock : function lock() {
-    
+  lock : function lock(callback) {
+    callback = setGenericCallbackIfUndefined(callback, 'lock');
+    Meteor.call('lock', this._id, callback);
   }, 
   invitePlayer : function invitePlayer(email, username, squares, callback) {
-    callback = setGenericCallbackIfUndefined(callback, 'modifySquares');
+    callback = setGenericCallbackIfUndefined(callback, 'invitePlayer');
     Meteor.call('inviteUser', this._id, email, username, squares, callback);
   },
   canModifySquare : function canModifySquare(user, x, y) {

@@ -245,23 +245,23 @@ Meteor.methods({
 			console.log("boardID: ", boardID);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user())	SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
-		if (!board.isOwner(SB.User.user())) SB.Error("Only owners can add an owner.");
+		if (!board.isOwner(SB.User.user())) SB.Error("Only owners can lock a board.");
 
-		if (!board.locked) {
+		// if locked, unlock board
+		if (board.locked) {
 			SB.Board.update({_id: boardID},{$set: {
-					winnerNumbers: [0,1,2,3,4,5,6,7,8,9].shuffle(),
-					loserNumbers: [0,1,2,3,4,5,6,7,8,9].shuffle(),
-					locked: true			
+					winnerNumbers: null,
+					loserNumbers: null,	
+					locked: false			
 				}
 			});
 		}
 		else {
 			SB.Board.update({_id: boardID},{$set: {
-					winnerNumbers: null,
-					loserNumbers: null,	
-					locked: false			
+					winnerNumbers: [0,1,2,3,4,5,6,7,8,9].shuffle(),
+					loserNumbers: [0,1,2,3,4,5,6,7,8,9].shuffle(),
+					locked: true			
 				}
 			});
 		}

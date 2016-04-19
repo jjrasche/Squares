@@ -1,4 +1,4 @@
-SB.namespacer('SB', {debug: true});
+SB.namespacer('SB', {debug: false});
 
 SB.namespacer('SB', {handleServerError : 
 	function handleServerError(err) {

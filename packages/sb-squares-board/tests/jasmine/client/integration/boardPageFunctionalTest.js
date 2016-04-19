@@ -88,9 +88,9 @@ describe("Board page funcitonal tests", function() {
     var invitee = SB.fixture.tester2;
     var user = SB.User.user();
     var board = user.boards()[0];
-    var squares = [{x: 2, y: 2}];
+    var squares = [{x: 2, y: 2}, {x: 0, y: 9}];
 
-    // add member without giving any squares
+    // add member
     board.invitePlayer(invitee.email, invitee.username, squares, function(err, res) {
       board = user.boards()[0];
       invitee = SB.User.findOne({username: invitee.username});
@@ -158,6 +158,7 @@ describe("Board page funcitonal tests", function() {
   });  
 
   it('owner unable to assign more squares than exist', function(done) {
+    console.log('owner unable to assign more squares than exist');
     var owner = SB.User.user();
     var invitee = SB.User.findOne({username: SB.fixture.tester2.username});
     var board = owner.boards()[0];
@@ -194,6 +195,7 @@ describe("Board page funcitonal tests", function() {
     beforeAll(waitForRouter);
 
     it('non-owner cannot take non-empty square', function(done) {
+      console.log('non-owner cannot take non-empty square');
       var user = SB.User.user();
       var board = user.boards()[0];
       var origUserNumSquares = board.memberNumSquares(user);
@@ -234,6 +236,7 @@ describe("Board page funcitonal tests", function() {
     });
 
     it('non-owner can remove own square', function(done) {
+      console.log('non-owner can remove own square');
       var user = SB.User.user();
       var board = user.boards()[0];
       var origUserNumSquares = board.memberNumSquares(user);
@@ -254,6 +257,35 @@ describe("Board page funcitonal tests", function() {
     });      
   });
 
+
+  describe('prevent logic', function() {
+    // login as non-owner
+    beforeAll(function (done) {
+      var user = SB.fixture.tester;
+      Meteor.loginWithPassword(user.email, user.password, function(err){
+        Router.go('sbSquaresBoardPage', {_id: SB.User.user().profile.boardIDs[0]});
+        Tracker.afterFlush(done);
+        done();
+      });
+    });
+    beforeAll(waitForRouter);
+
+    it('able to lock board', function(done) {
+      console.log('able to lock board');
+      var owner = SB.User.user();
+      var board = owner.boards()[0];
+
+      board.lock(function(err, res) {
+        board = owner.boards()[0];
+        console.log('lock: ', board, err, res);
+        expect(err).toBeUndefined();
+        expect(board.winnerNumbers).toBeTruthy();
+        expect(board.loserNumbers).toBeTruthy();
+        expect(board.locked).toBeTruthy();
+        done();
+      });
+    }); 
+  });
 
 }); 
 

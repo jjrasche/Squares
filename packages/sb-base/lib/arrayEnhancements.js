@@ -1,5 +1,5 @@
-Array.prototype.shuffle = function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
+Array.prototype.shuffle = function shuffle() {
+  var currentIndex = this.length, temporaryValue, randomIndex;
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
     // Pick a remaining element...
@@ -7,9 +7,9 @@ Array.prototype.shuffle = function shuffle(array) {
     currentIndex -= 1;
 
     // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
+    temporaryValue = this[currentIndex];
+    this[currentIndex] = this[randomIndex];
+    this[randomIndex] = temporaryValue;
   }
-  return array;
+  return this;
 }
