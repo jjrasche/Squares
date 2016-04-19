@@ -262,9 +262,7 @@ Template.grid.helpers({
 Template.lockBoardButton.events({
     'click #lockBoardButton': function(event) {
         if (window.confirm('cannot undo')) {
-            Meteor.call('randomizeBoardNumbers', this._id, function(err, res) {
-                if (err) console.log(err);
-            })
+            this.lock();
         }
     }
 });

@@ -258,7 +258,7 @@ describe("Board page funcitonal tests", function() {
   });
 
 
-  describe('prevent logic', function() {
+  describe('lock board', function() {
     // login as non-owner
     beforeAll(function (done) {
       var user = SB.fixture.tester;
@@ -270,7 +270,7 @@ describe("Board page funcitonal tests", function() {
     });
     beforeAll(waitForRouter);
 
-    it('able to lock board', function(done) {
+    it('owner able to', function(done) {
       console.log('able to lock board');
       var owner = SB.User.user();
       var board = owner.boards()[0];

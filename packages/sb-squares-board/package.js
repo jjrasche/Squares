@@ -10,14 +10,13 @@ Package.describe({
 
 Package.onUse(function (api) {
   // server and client dependencies
-  api.use([
+  var packages = [
     'jjrasche:sb-base'
     ,'jjrasche:sb-user'
-  ], both);
-  api.imply([
-    'jjrasche:sb-base'
-    ,'jjrasche:sb-user'
-  ], both);
+    ,'afruth:chapp'
+  ]
+  api.use(packages, both);
+  api.imply(packages, both);
 
   // server and client files
   // api.addFiles(['lib/inviationEmail.html'], server) // meteor methods need this

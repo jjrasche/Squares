@@ -65,7 +65,6 @@ Package.onUse(function (api) {
     ,'peppelg:bootstrap-3-modal'
     ,'yogiben:autoform-modals'
     ,'sacha:spin'
-    ,'afruth:chapp'
   ]
   api.use(packages, client);
   api.imply(packages, client);
