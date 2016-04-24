@@ -90,23 +90,24 @@
 
 <template name="editWidget">
 	{{#if sbSquaresBoardBoardOwner this}}
-		{{> editCheckBox}}
-		<br>
-		{{> invitePlayersModal}}
-		{{> changeBoardOwnershipModal}}
-		<br>
-		{{> lockBoardButton}}
-		{{> assignSquaresModal}}
-		<br>
-		{{> changeRefreshCriteria}}
-<!-- 		{{selectedSquares}}
-		{{squareSize}} -->
+		{{> editButton}}
+		{{#if sbSquaresBoarInEditMode}}
+			<br>
+			{{> invitePlayersModal}}
+			{{> assignSquaresModal}}
+			<br>
+			{{> lockBoardButton}}
+			{{> changeBoardOwnershipModal}}
+			<br>
+			{{> changeRefreshCriteria}}
+		{{/if}}
 	{{/if}}
 </template>
 
-<template name="editCheckBox">
-	Edit Mode<input type="checkbox"  id="editCheckBox">
+<template name="editButton">
+	<button id="editButton">Edit Mode</button>
 </template>
+
 <template name="changeRefreshCriteria">
 	{{> changeRefreshRate}}
 	{{> refreshBetweenDates}}
@@ -137,7 +138,7 @@
 </template>
 
 <template name="invitePlayersModal">
-	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="invitePlayersButton">Invite</button>
+	<button class="btn btn-primary" id="invitePlayersButton">Invite</button>
 
     <div class="modal fade">
         <div class="modal-dialog">
@@ -156,7 +157,7 @@
  	                		<label class="control-label" for="userNameInvitePlayerModal">User Name</label>
  	                		<input type="text" id="userNameInvitePlayerModal" name="username">
 	                	</div>
-	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
+	                	<button id="invitePlayersModalButton" type="submit" class="btn btn-primary">Invite</button>
 	                </form>
 	            </div>
                 <div class="modal-footer"></div>
@@ -193,7 +194,7 @@
  	                		<label class="control-label" for="members">Pick invited user to make owner</label>
 	                		{{> boardMemeberSelector}}
 	                	</div>
-	                	<button id="assignSquaresModalButton" type="submit" class="btn btn-primary">Assign</button>
+	                	<button id="changeOwnersButton" type="submit" class="btn btn-primary">Assign</button>
 	                </form>
 	            </div>
 
@@ -207,7 +208,7 @@
 
 
 <template name="assignSquaresModal">
-	<button class="btn btn-primary {{boardPageEditButtonDisabled}}" id="assignSelectedSquares">assign</button>
+	<button class="btn btn-primary" id="assignSelectedSquares">assign</button>
 
     <div class="modal fade">
         <div class="modal-dialog">

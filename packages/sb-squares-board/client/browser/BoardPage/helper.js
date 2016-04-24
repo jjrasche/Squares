@@ -57,19 +57,6 @@ Session.set('boardPageMemberListSort', {prop: 'username', order: 1});
 
 
 
-Template.editCheckBox.events({
-    'click #editCheckBox' : function(event){
-        var val = document.querySelector('#editCheckBox:checked');
-        console.log("editCheckBox.events(: ", val);
-        if (val) Session.set('boardPageEditMode', true);
-        else {
-            Session.set('boardPageEditMode', false);
-            Session.set('boardPageselectedSquares', []);
-        }
-        console.log(Session.get('boardPageEditMode'));
-    }
-})
-
 Template.changeRefreshCriteria.events({
     'keypress #changeRefreshRate' : function(event, template){
         // if enter do thing
@@ -93,23 +80,30 @@ Template.changeRefreshCriteria.events({
         }
     }
 })
-// Template.assignSquaresModal.events({
-//   'click #assignSelectedSquares' : function(event){
-//     //event.preventDefault();
-//     Modal.show('assignSquaresModal');
 
-//   }
-// })
+
+
+Template.editButton.events({
+    'click #editButton' : function(event){
+        var inEditMode = Session.get('boardPageEditMode');
+
+        if (inEditMode) {
+            Session.set('boardPageEditMode', false);
+            Session.set('boardPageselectedSquares', []);
+        }
+        else
+            Session.set('boardPageEditMode', true);
+
+        console.log(Session.get('boardPageEditMode'));
+    }
+})
 
 Template.editWidget.helpers({
-    squareSize: function () {
+    squareSize: function() {
         return JSON.stringify(Session.get('size'));
     },
-    selectedSquares: function () {
+    selectedSquares: function() {
         return JSON.stringify(Session.get('boardPageselectedSquares'));
-    },
-    inEditMode: function () {
-        return Session.get('boardPageEditMode')  
     }
 })
 
@@ -258,7 +252,7 @@ Template.grid.helpers({
 
 Template.lockBoardButton.events({
     'click #lockBoardButton': function(event) {
-        if (window.confirm('cannot undo')) {
+        if (window.confirm('are you sure you want to lock board?')) {
             this.lock();
         }
     }
@@ -524,10 +518,9 @@ Template.memberItem.events({
         else newSort = {prop: newProp, order: 1}
 
         // Session.set('boardPageMemberListSort', newSort);
-        console.log("click .memberListHeaderName", newSort);
+        // console.log("click .memberListHeaderName", newSort);
     },
     "keypress .memberListNumSquares": function(event, template) {
-        console.log("keypress .memberListNumSquares: ", event, event.which);
         if (event.which === 13) {
             var newNumSquares = template.find(".memberListNumSquares").value;
             var user = this;
@@ -538,7 +531,6 @@ Template.memberItem.events({
     },
     "click .memberListPaid": function(event, template) {
         var newPaid = template.find(".memberListPaid").checked;
-        console.log("click .memberListPaid: ", newPaid);
         var user = this;
         var board = Template.parentData(1);
         board.updateMembers(user._id, {paid: newPaid});
@@ -548,26 +540,20 @@ Template.memberItem.events({
 
 
 
-Template.registerHelper('boardPageEditButtonDisabled', 
-    function(){
-        if (Session.get('boardPageEditMode') ) {
-        //&& Session.get('boardPageselectedSquares').length > 0)
-        return "";
-        }
-        else return "disabled";
-    }
-);
-
 
 Template.registerHelper('printThis',
     function(name) {
         console.log("printThis (" + name + "): " , this);
     }
 );
-
 Template.registerHelper('sbSquaresBoardBoardOwner',
     function(board) {
         return board.isOwner(SB.User.user());
+    }
+);
+Template.registerHelper('sbSquaresBoarInEditMode',
+    function() {
+        return Session.get('boardPageEditMode') 
     }
 );
 
