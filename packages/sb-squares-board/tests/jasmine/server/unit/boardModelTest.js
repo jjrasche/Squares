@@ -1,4 +1,4 @@
-describe("Board instance methods", function() {
+describe("BoardModelTest", function() {
   // test initial state of board
   describe("new board state", function() {
     beforeAll(function(done) {
@@ -13,10 +13,17 @@ describe("Board instance methods", function() {
         done();
       });
     });
+    var board, owner;
+    beforeAll(function(done) {
+      var user = SB.User.findOne({username: SB.fixture.tester2.username});
+      Meteor.call('createBoard', 'initializedBoard', user._id, function(err, res){
+        board = SB.Board.findOne(res);
+        owner = SB.User.findOne(board.owners[0]);
+        done();
+      });
+    });
 
-    var board = SB.Board.findOne();
-    var owner = SB.User.findOne(board.owners[0]);
-
+    // this first spec waits for beforeAlls to run and only then are fixtures ready.
     it('no squares committed', function() {
       expect(board.numUnCommittedSquares()).toEqual(SB.Board.const.NUM_SQUARES)
     });

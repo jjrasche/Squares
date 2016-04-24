@@ -1,4 +1,4 @@
-describe("Board creation", function() {
+describe("BoardCreationTest", function() {
   // reset DB
   beforeAll(function(done) {
     Meteor.call('resetTestingEnvironment', 'boardCreation.js', function(err, res) {

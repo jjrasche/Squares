@@ -16,12 +16,12 @@ Meteor.publish("board", function (boardID) {
 
 	boardHandle = SB.Board.find({_id: boardID}).observeChanges({
 		added: function(id, board) { 
-			// console.log('added board: ', id, board._id);
+			console.log('added board: ', id, board._id);
 			sub.added(boardColName, id, board); 
 		},
 		// if members field change subscribe to all boards members again
 		changed: function(id, fields) { 
-			// console.log('changed board: ', id, fields);
+			console.log('changed board: ', id, fields);
 			if (boardID == id && fields['members'])
 				publishMembers(id, fields['members']);
 			sub.changed(boardColName, id, fields);

@@ -68,11 +68,22 @@ var initializeFixutres = function initializeFixutres() {
   // create board
   var future = new Future();
   if (!SB.Board.find().count()) {
+    var boardCreatedFuture = new Future();
     Meteor.call('createBoard', 'testBoard', tester._id, function(err, res) {
       if (!err) board = SB.Board.findOne(res);
       else console.log(err);
+      boardCreatedFuture.return();
+    });
+    boardCreatedFuture.wait();
+
+    // add tester3 to the board 
+    var invitee = SB.fixture.tester3;
+    Meteor.call('invitePlayer', board._id, board.owners[0], invitee.email, invitee.username, [{x:1, y:8}], function(err, res) {
+      invitee = SB.User.findOne({username: invitee.username});
+      if (err) console.log('fixture invitePlayer: ', err.stack)
       future.return();
     });
+
     if (SB.debug) console.log(board);
   }
 
@@ -85,7 +96,7 @@ var initializeFixutres = function initializeFixutres() {
     }
     if (SB.debug) console.log(games[0]);
   }
-  future.wait();
+  // future.wait();
 }
 
 Meteor.methods({

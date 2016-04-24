@@ -2,7 +2,15 @@ SB.namespacer('SB.ErrMsg', {INVALID_BOARD_ERROR : 'Board not found'});
 SB.namespacer('SB.ErrMsg', {INVALID_USER_ERROR : 'User not found'});
 SB.namespacer('SB.ErrMsg', {NOT_LOGGED_IN_ERROR : 'User not logged in'});
 SB.namespacer('SB.ErrMsg', {INVALID_BOARD_OWNER_ERROR : 'Board owner not found'});
-
+SB.namespacer('SB.ErrMsg', {OVER_ALLOCATED_SQUARES : function(board, newOwner) {
+  var numMemberSquaresOnBoard = board.memberOccupiedSquares(newOwner).length;
+  var numMemberAllocatedSquares = board.memberNumSquares(newOwner); 
+  return 'Move would assign ' + 
+          (numMemberSquaresOnBoard - numMemberAllocatedSquares)
+          + ' more squares to ' + newOwner.username
+          + ' putting the total number of assigned squares at '
+          + board.numAssignedSquares()
+}});
 
 SB.namespacer('SB', {Board: 
   new Mongo.Collection('boards', {
@@ -169,6 +177,9 @@ _.extend(SB.Board.model.prototype, {
       ret += m.numSquares;
     })
     return ret;
+  },
+  overAllocatedSquares : function overAllocatedSquares() {
+    return this.numAssignedSquares() > SB.Board.const.NUM_SQUARES;
   },
   // getSquareOwner = function getSquareOwner(board, x, y) {
   //   var square = board.getSquare(x,y);

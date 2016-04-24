@@ -19,7 +19,11 @@ _.extend(SB.Board.model.prototype, {
   }, 
   invitePlayer : function invitePlayer(email, username, squares, callback) {
     callback = setGenericCallbackIfUndefined(callback, 'invitePlayer');
-    Meteor.call('inviteUser', this._id, email, username, squares, callback);
+    Meteor.call('invitePlayer', this._id, SB.User.ID(), email, username, squares, callback);
+  },
+  updateMembers : function updateMembers(memberID, modifier, callback) {
+    callback = setGenericCallbackIfUndefined(callback, 'updateMembers');
+    Meteor.call('updateMembers', this._id, memberID, modifier, callback);
   },
   canModifySquare : function canModifySquare(user, x, y) {
     var square = this.getSquare(x,y);

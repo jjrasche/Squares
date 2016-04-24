@@ -3,94 +3,70 @@ if (Meteor.isServer) {
 	Future = Npm.require("fibers/future");
 }
 
+/*
+	all async calls within an async call should guarentee completement prior to returning
+	Note: the invite user chain may take a while, waiting for all these actions to happen
+*/
+var syncModifySquares = function syncModifySquares(boardID, userID, squares) {
+	var future = new Future();
+	Meteor.call('modifySquares', boardID, userID, squares, function(err, res) {
+		console.log('modifySquares: ', err, res);
+		if (!err) future.return(res);
+	    else future.throw(err);
+	});
+	return(future.wait());
+}
+
+
 // edit mode allows owners to select multiple squares and assign them to a single email 
 Meteor.methods({
-	inviteUser: function inviteUser(boardID, email, username, squares) {
+	invitePlayer: function invitePlayer(boardID, ownerID, email, username, squares) {
 		var board = SB.Board.findOne(boardID);
+		var owner = SB.User.findOne(ownerID);
 		if (SB.debug) {
-			console.log("---- createUserAndInvitation ----");
+			console.log("---- invitePlayer ----");
 			console.log("boardID: ", boardID);
+			console.log("ownerID: ", ownerID);
 			console.log("email: ", email);
 			console.log("userName: ", username);
 			console.log("squares: ", squares);
 			console.log("---------------------------------");
 		}
 		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!owner) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
 
 		if (Meteor.isServer) {
 		    // if email address is attached to user and user already a member, cannot add
-		    var existingUserID = Meteor.call('findUserByEmail', email);
-		    if (existingUserID && board.memberID(existingUserID))
+		    var inviteeID = Meteor.call('findUserByEmail', email), invitee;
+		    if (inviteeID && board.memberID(inviteeID))
 		        throw new Meteor.Error("User already on board, try re-assigning squares");
 
-		    if (existingUserID) {
-		      console.log("found existing user: ", existingUserID);
-		      Meteor.call('sendInvitation', boardID, existingUserID, squares);
-		    }
-		    else {
-		      console.log("inserting new user",  boardID, email, username, squares);
-		      Meteor.call('createUserAndInvitation', boardID, email, username, squares);
-		    }
-		}
-	},
-	createUserAndInvitation: function createUserAndInvitation(boardID, email, username, squares) {
-		if (SB.debug) {
-			console.log("---- createUserAndInvitation ----");
-			console.log("boardID: ", boardID);
-			console.log("email: ", email);
-			console.log("userName: ", username);
-			console.log("squares: ", squares);
-			console.log("---------------------------------");
-		}
+		    // find or create user
+		    if (!inviteeID) {
+			    // if no email set a default password for userName login
+				var tempPassword = email ? Random.hexString(5) : HARDCODEDDEFAULTPASSWORD;
+				var userObject = {
+			        password: tempPassword,
+			        username: username
+			    };
+			    if (email) userObject.email = email;
+			    inviteeID = Accounts.createUser(userObject);
+			    invitee = SB.User.findOne(inviteeID);
+			}
+		    else invitee = SB.User.findOne(inviteeID);
 
-		if (Meteor.isServer) {
-			// if no email set a default password for userName login
-			var tempPassword = email ? Random.hexString(5) : HARDCODEDDEFAULTPASSWORD;
-			var userObject = {
-		        password: tempPassword,
-		        username: username
-		    };
-		    if (email) userObject.email = email;
-		    else userObject.username = username;
-
-			var userID = Accounts.createUser(userObject);
-			Meteor.call('sendInvitation', boardID, userID, squares, tempPassword)
-		    return userID; 
-		}
-	},
-	sendInvitation: function sendInvitation(boardID, userID, squares, tempPassword) {
-		var board = SB.Board.findOne(boardID);
-  		var boardOwner = SB.User.user();
-		var user = SB.User.findOne(userID);
-		var email = user.emails != undefined ? user.emails[0].address : null;
-
-		if (SB.debug) {
-			console.log("---- sendInvitation ----");
-			console.log("boardID: ", boardID);
-			console.log("userID, email: ", userID, email);
-			console.log("squares: ", squares);
-			console.log("tempPassword: ", tempPassword);
-			console.log("---------------------------------");
-		}
-		if (!SB.User.user()) SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
-		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
-		if (!user) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
-		if (!boardOwner) SB.Error(SB.ErrMsg.INVALID_BOARD_OWNER_ERROR);
-
-
-		if (Meteor.isServer) {
+		    // send email
 			if (email) {
 				console.log('sendInvitation: ', Assets);
 				SSR.compileTemplate('invitationEmailHTML', emailInvitationTemplate);//Assets.getText( '/packages/jjrasche_sb-squares-board/private/invitationEmail.html' ) );
 				var emailData = {
 					email: email,
 					password: tempPassword,
-					userName: user.username,
+					userName: invitee.username,
 					boardName: board.name ? board.name : 'boardName',
 					numSquares: squares.length,
-					boardOwner: boardOwner.username ? boardOwner.username : 'boardOwner',
+					boardOwner: owner.username ? owner.username : 'boardOwner',
 				};
-
 				// try to send invitation
 				Email.send({
 			      to: email,
@@ -99,14 +75,12 @@ Meteor.methods({
 			      html: SSR.render('invitationEmailHTML', emailData)
 			    })
 			}
-			
-			user.update({$set : {'profile.boardIDs' : user.profile.boardIDs.concat([boardID])}});
 
-			Meteor.call('modifySquares', boardID, userID, squares, function(err, res) {
-				if (err) 
-					throw err;
-			});
-		
+			var newBoardIDs = invitee.profile.boardIDs.concat([boardID])
+			console.log('newBoardIDs: ', newBoardIDs);
+			invitee.update({$set : {'profile.boardIDs' : newBoardIDs}});
+
+			syncModifySquares(boardID, inviteeID, squares);	
 		}
 	},
 	modifySquares: function modifySquares(boardID, userID, squares) {
@@ -121,10 +95,11 @@ Meteor.methods({
 			console.log("squares: ", squares);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user()) SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		// if (!SB.User.user()) SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
 		if (!newOwner) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
 
+		console.log('board.member(newOwner): ', board.member(newOwner));
 		// if user not in board members, add her
 		if (!board.member(newOwner)) {
 			var member = {
@@ -132,6 +107,7 @@ Meteor.methods({
 				numSquares: squares.length,
 				paid: false       
 			}
+			console.log('adding memeber: ', member);
 			board.members.push(member);
 			set.members = board.members;
 		}
@@ -186,13 +162,8 @@ Meteor.methods({
 				if (m._id == newOwner._id) m.numSquares = numMemberSquaresOnBoard;
 					return m; 
 			});
-			if (board.numAssignedSquares() > SB.Board.const.NUM_SQUARES) {
-				throw SB.Error('Move would assign ' + 
-								(numMemberSquaresOnBoard - numMemberAllocatedSquares)
-								+ ' more squares to ' + newOwner.username
-								+ ' putting the total number of assigned squares at '
-								+ board.numAssignedSquares())
-			}
+			if (board.overAllocatedSquares()) 
+				SB.Error(SB.ErrMsg.OVER_ALLOCATED_SQUARES(board, newOwner));
 			set.members = board.members;
 		}
 
@@ -214,6 +185,36 @@ Meteor.methods({
 			board[key] = set[key] = val
 		}	
 	},
+	updateMembers: function updateMembers(boardID, memberID, modifier) {
+		var board = SB.Board.findOne(boardID);
+		var member = SB.User.findOne(memberID);
+
+		if (SB.debug) {
+			console.log("---- updateMembers ----");
+			console.log("boardID: ", boardID);
+			console.log("memberID: ", memberID);
+			console.log("modifier: ", modifier);
+			console.log("---------------------------------");
+		}
+		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
+		if (!member) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
+		if (!member) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
+
+		board.members = board.members.map(function(m) {
+			if (m._id === memberID) {
+				return {
+					_id : memberID,
+					numSquares : modifier.numSquares === undefined ? m.numSquares : modifier.numSquares,
+					paid : modifier.paid === undefined ? m.paid : modifier.paid
+				}
+			}
+			return m;
+		});
+		if (board.overAllocatedSquares()) 
+			SB.Error(SB.ErrMsg.OVER_ALLOCATED_SQUARES(board, member)); 
+
+		return SB.Board.update({_id: boardID}, {$set: {members: board.members}});
+	},
 	addOwner: function addOwner(boardID, userID) {
 		var board = SB.Board.findOne(boardID);
 		var newOwner = SB.User.findOne(userID);
@@ -224,7 +225,7 @@ Meteor.methods({
 			console.log("userID: ", userID);
 			console.log("---------------------------------");
 		}
-		if (!SB.User.user())	SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
+		// if (!SB.User.user())	SB.Error(SB.ErrMsg.NOT_LOGGED_IN_ERROR);
 		if (!board) SB.Error(SB.ErrMsg.INVALID_BOARD_ERROR);
 		if (!newOwner) SB.Error(SB.ErrMsg.INVALID_USER_ERROR);
 		if (!board.isOwner(SB.User.user())) SB.Error("Only owners can add an owner.");

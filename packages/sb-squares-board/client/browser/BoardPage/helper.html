@@ -73,16 +73,23 @@
 <template name="memberItem">
 	<li class="list-group-item nopadding">
 		<div class="row nopadding {{headerClass}}"> 
-			<div class="col-xs-9 {{nameClass}}" style="background-color: white">{{name }}</div>
-			<div class="col-xs-1 {{numSquaresClass}} nopadding" style="text-align: center;background-color: white">{{numSquares ..}}</div>
-			<div class="col-xs-2 {{winningsClass}} nopadding" style="text-align: center;background-color: white">{{winnings ..}}</div>
-		<!-- <div class="col-xs-2 {{paidClass}} nopadding" style="text-align: center;background-color: white">{{paid ..}}</div>-->		</div>
+			{{#if sbSquaresBoardBoardOwner ..}}
+				<div class="col-xs-7 {{nameClass}}" style="{{nameStyle}}">{{name}}</div>
+				<input class="col-xs-2 {{numSquaresClass}}" style="{{numSquaresStyle}}" type="{{numSquaresType}}" {{readonly}} value={{numSquares ..}}>
+				<input class="col-xs-2 {{winningsClass}}" style="{{winningsStyle}}" readonly value={{winnings ..}}>
+			 	<input class="col-xs-1 {{paidClass}}" style="{{paidStyle}}" type="{{paidType}}" {{readonly}} value={{paid ..}}>
+			 {{else}}
+				<div class="col-xs-8 {{nameClass}}" style="{{nameStyle}}">{{name}}</div>
+				<input class="col-xs-2 {{numSquaresClass}}" style="{{numSquaresStyle}}" type="{{numSquaresType}}" readonly value={{numSquares ..}}>
+				<input class="col-xs-2 {{winningsClass}}" style="{{winningsStyle}}" readonly value={{winnings ..}}>
+			 {{/if}}		
+		</div>
 	</li>
 </template>
 
 
 <template name="editWidget">
-	{{#if boardOwner}}
+	{{#if sbSquaresBoardBoardOwner this}}
 		{{> editCheckBox}}
 		<br>
 		{{> invitePlayersModal}}

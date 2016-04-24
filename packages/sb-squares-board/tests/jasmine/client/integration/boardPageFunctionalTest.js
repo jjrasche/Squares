@@ -1,18 +1,3 @@
-/*
-    couldn't find a way to run asyn call to login inside it tests so broke
-    users out in separate describe statements.
-*/
-
-
-/*    PROBLEMS
-  double call of 'resetTestingEnvironment' likely due to something like
-    https://github.com/meteor/meteor/issues/4263
-    - separating clearDB and initializeData functions 'fixed'
-
-
-*/
-
-
 describe("Board page funcitonal tests", function() {
   // reset DB
   beforeAll(function(done) {
@@ -83,6 +68,9 @@ describe("Board page funcitonal tests", function() {
     });
   });  
 
+  //TODO: test proper exception escalation from invitee functions
+  // unable to take another users squares if not owner. 
+
 
   it('Invite an existing user board member', function(done) {
     var invitee = SB.fixture.tester2;
@@ -92,6 +80,7 @@ describe("Board page funcitonal tests", function() {
 
     // add member
     board.invitePlayer(invitee.email, invitee.username, squares, function(err, res) {
+      if (err) console.log('Invite an existing user board member: ', err);
       board = user.boards()[0];
       invitee = SB.User.findOne({username: invitee.username});
 
@@ -270,7 +259,7 @@ describe("Board page funcitonal tests", function() {
     });
     beforeAll(waitForRouter);
 
-    it('owner able to', function(done) {
+    it('owner able to lock board', function(done) {
       console.log('able to lock board');
       var owner = SB.User.user();
       var board = owner.boards()[0];

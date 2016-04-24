@@ -102,9 +102,6 @@ Template.changeRefreshCriteria.events({
 // })
 
 Template.editWidget.helpers({
-    boardOwner: function() {
-        return this.isOwner(SB.User.user());
-    },
     squareSize: function () {
         return JSON.stringify(Session.get('size'));
     },
@@ -427,24 +424,6 @@ Template.memberList.helpers({
 });
 
 Template.memberItem.helpers({
-    name: function() {
-        if (this == "header") return "member";
-        return this.username;
-    },
-    numSquares: function(board) {
-        if (this == "header") return "#";
-        return board.memberNumSquares(this);    
-    },
-    winnings: function(board) {
-        if (this == "header") return "$";
-        var winnings = board.memberWinnings(this);
-        return winnings;
-    },
-    paid: function(board) {
-        if (this == "header") return "paid";
-        var ret = board.memberPaid(this);
-        return ret == true ? 'Y' : 'N'
-    },
     headerClass: function() {
         if (this == "header") return "memberListHeader";
         return "";
@@ -457,17 +436,60 @@ Template.memberItem.helpers({
         }
         return classes;
     },
+    nameStyle: function() {
+        return "background-color: white";
+    },
+    name: function() {
+        if (this == "header") return "member";
+        return this.username;
+    },
     numSquaresClass: function() {
-        if (this == "header") return "memberListHeaderNumSquares";
-        return "memberListNumSquares";
+        if (this == "header") 
+            return "memberListHeaderNumSquares nopadding";
+        return "memberListNumSquares nopadding";
+    },
+    numSquaresStyle: function() {
+        return "text-align: center;background-color: white";
+    },
+    numSquaresType: function(board) {
+        if (this == "header") return 'text';
+        return 'number';
+    },
+    numSquares: function(board) {
+        if (this == "header") return "#";
+        return board.memberNumSquares(this);    
     },
     winningsClass: function() {
-        if (this == "header") return "memberListHeaderWinnings";
-        return "memberListWinnings";
+        if (this == "header") return "memberListHeaderWinnings nopadding";
+        return "memberListWinnings nopadding";
+    },
+    winningsStyle: function() {
+        return "text-align: center;background-color: white";
+    },
+    winnings: function(board) {
+        if (this == "header") return "$";
+        var winnings = board.memberWinnings(this);
+        return winnings;
     },
     paidClass: function() {
-        if (this == "header") return "memberListHeaderPaid";
-        return "memberListPaid";
+        if (this == "header") return "memberListHeaderPaid nopadding";
+        return "memberListPaid nopadding";
+    },
+    paidStyle: function() {
+        return "text-align: center;background-color: white";
+    },
+    paidType: function(board) {
+        if (this == "header") return 'text';
+        return 'checkbox';
+    },
+    paid: function(board) {
+        if (this == "header") return "paid";
+        var ret = board.memberPaid(this);
+        return ret;
+    },
+    readonly: function() {
+        if (this == "header") return 'readonly';
+        return ''
     }
 });
 Template.memberItem.events({
@@ -503,7 +525,25 @@ Template.memberItem.events({
 
         // Session.set('boardPageMemberListSort', newSort);
         console.log("click .memberListHeaderName", newSort);
+    },
+    "keypress .memberListNumSquares": function(event, template) {
+        console.log("keypress .memberListNumSquares: ", event, event.which);
+        if (event.which === 13) {
+            var newNumSquares = template.find(".memberListNumSquares").value;
+            var user = this;
+            var board = Template.parentData(1);
+
+            board.updateMembers(user._id, {numSquares: newNumSquares});
+        }
+    },
+    "click .memberListPaid": function(event, template) {
+        var newPaid = template.find(".memberListPaid").checked;
+        console.log("click .memberListPaid: ", newPaid);
+        var user = this;
+        var board = Template.parentData(1);
+        board.updateMembers(user._id, {paid: newPaid});
     }
+
 });
 
 
@@ -522,6 +562,12 @@ Template.registerHelper('boardPageEditButtonDisabled',
 Template.registerHelper('printThis',
     function(name) {
         console.log("printThis (" + name + "): " , this);
+    }
+);
+
+Template.registerHelper('sbSquaresBoardBoardOwner',
+    function(board) {
+        return board.isOwner(SB.User.user());
     }
 );
 
