@@ -99,12 +99,7 @@ Template.editButton.events({
 })
 
 Template.editWidget.helpers({
-    squareSize: function() {
-        return JSON.stringify(Session.get('size'));
-    },
-    selectedSquares: function() {
-        return JSON.stringify(Session.get('boardPageselectedSquares'));
-    }
+
 })
 
 
@@ -520,14 +515,12 @@ Template.memberItem.events({
         // Session.set('boardPageMemberListSort', newSort);
         // console.log("click .memberListHeaderName", newSort);
     },
-    "keypress .memberListNumSquares": function(event, template) {
-        if (event.which === 13) {
-            var newNumSquares = template.find(".memberListNumSquares").value;
-            var user = this;
-            var board = Template.parentData(1);
+    "input .memberListNumSquares": function(event, template) {
+        var newNumSquares = template.find(".memberListNumSquares").value;
+        var user = this;
+        var board = Template.parentData(1);
 
-            board.updateMembers(user._id, {numSquares: newNumSquares});
-        }
+        board.updateMembers(user._id, {numSquares: Number(newNumSquares)});
     },
     "click .memberListPaid": function(event, template) {
         var newPaid = template.find(".memberListPaid").checked;

@@ -5,11 +5,12 @@ SB.namespacer('SB.ErrMsg', {INVALID_BOARD_OWNER_ERROR : 'Board owner not found'}
 SB.namespacer('SB.ErrMsg', {OVER_ALLOCATED_SQUARES : function(board, newOwner) {
   var numMemberSquaresOnBoard = board.memberOccupiedSquares(newOwner).length;
   var numMemberAllocatedSquares = board.memberNumSquares(newOwner); 
+  var numTotalSquares = board.numAssignedSquares();
   return 'Move would assign ' + 
-          (numMemberSquaresOnBoard - numMemberAllocatedSquares)
-          + ' more squares to ' + newOwner.username
+          (numMemberAllocatedSquares - numMemberSquaresOnBoard)
+          + ' more square(s) to ' + newOwner.username
           + ' putting the total number of assigned squares at '
-          + board.numAssignedSquares()
+          + numTotalSquares
 }});
 
 SB.namespacer('SB', {Board: 
