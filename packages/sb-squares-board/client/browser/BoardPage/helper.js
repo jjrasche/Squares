@@ -102,6 +102,12 @@ Template.editWidget.helpers({
 
 })
 
+var Highcharts = require('highcharts');
+// require('highcharts/modules/highmaps')(Highcharts);
+require('highcharts/modules/heatmap')(Highcharts);
+// require('highcharts/modules/drilldown')(Highcharts);
+// require('highcharts/modules/map')(Highcharts);
+// require('highcharts/modules/gray')(Highcharts);
 
 Template.grid.helpers({
     createChart: function () {

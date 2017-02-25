@@ -17,3 +17,13 @@ from within the newly created board page, a board owner can:
 2. _Edit_ the board by selecting multiple squares and taking bulk assignment actions
 3. _Lock_ the board at any time
 4. increase/decarease a specific users # of square or mark a user as _paid_
+
+### Application Setup
+#### get app running locally
+1. install node, meteor, npm
+2. in app folder run `meteor update`, then `meteor run`
+
+### expose app to internet
+1. setup port forwarding. test this by hitting the app via <ipAddress>:3000
+2. get a DNS hostname e.g. from noip.com and link to your <ipAddress>
+3. create a gmail account to send out invitation emails. Copy the mailSettings.config.js file in sb-base package and add you gmail username and password.

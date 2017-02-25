@@ -46,6 +46,7 @@ Package.onUse(function (api) {
 
   // server only files
   api.addFiles([
+    'server/mailSettings.config.js',
     'server/mailSettings.js'
     // ,'server/fixture.js'
   ], server);
@@ -59,8 +60,8 @@ Package.onUse(function (api) {
     ,'standard-minifiers'
     ,'es5-shim'
     ,'ecmascript'
-    ,'highcharts:highcharts-meteor'
-    ,'highcharts-container'
+    // ,'highcharts:highcharts-meteor'
+    // ,'highcharts-container'
     ,'twbs:bootstrap'
     ,'peppelg:bootstrap-3-modal'
     ,'yogiben:autoform-modals'

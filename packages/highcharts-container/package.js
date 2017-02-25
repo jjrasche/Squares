@@ -2,7 +2,7 @@ var minVersion = '4.2.1',
 fs = Npm.require('fs'),
 path = Npm.require('path'),
 npmPath = ['.npm', 'package', 'node_modules', 'highcharts'],
-configFile = path.resolve('./packages/sb-squares-board/config.highcharts.json'),
+configFile = path.resolve('./packages/highcharts-container/config.highcharts.json'),
 where = 'client',
 config = false;
 
