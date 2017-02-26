@@ -30,7 +30,7 @@ _.extend(SB.Board.model.prototype, {
     if (this.locked) 
       throw new Meteor.Error("board is locked, must unlock to make changes");
     // owners have permission to remove/add any member anywhere on board
-    if (this.isOwner(user)) {
+    if (this.isOwner(SB.User.user())) {
       return true;
     }
     else {  // non-owners can remove self from squares and add self to empty squares
