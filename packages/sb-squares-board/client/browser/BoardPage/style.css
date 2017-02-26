@@ -40,6 +40,10 @@
   font-weight: bold;
 }
 
+.selectedGameControl {
+  background-color: rgba(221, 221, 221, 0.98);
+}
+
 /*.row > [class*="col-"]{
     margin-bottom: -10000px;
     padding-bottom: 10000px;

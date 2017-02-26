@@ -38,6 +38,18 @@ SB.namespacer('SB.Game.query.function', { mostRecentWeeks :
   }
 });
 
+SB.namespacer('SB.Game.query.function', { todays :
+  function todays() {
+    return [{date: {$gte: SB.Date.beginningToday(), $lt: SB.Date.endToday()}}];
+  }
+});
+
+SB.namespacer('SB.Game.query.function', { all :
+  function all() {
+    return [];
+  }
+});
+
 // mostRecentDaysQuery = function mostRecentDaysQuery() {
 //   var mostRecentGameDate = getMostRecentGameDate();
 //   if (!mostRecentGameDate) return [];

@@ -32,13 +32,6 @@ X recording member activity
 */
 
 
-Session.set('boardPageselectedSquares', []);
-Session.set('boardPageselectedGames', []);
-Session.set('boardPageselectedMembers', []);
-Session.set('boardPageEditMode', false);
-Session.set('boardPageMemberListSort', {prop: 'username', order: 1});
-
-
 // Template.sbSquaresBoardPage.onCreated(function () {
 //     var instance = this;
 //     var boardID = instance.data;
@@ -340,12 +333,34 @@ Template.gameList.events({
 
         console.log("click .gameItems", games);
         Session.set('boardPageselectedGames', games);
+    },
+    "click .todaysGameSelector": function(event) {
+        selectGames(SB.Game.query.function.todays(), $(event.target));
+    },
+    "click .thisWeeksGameSelector": function(event) {
+        selectGames(SB.Game.query.function.mostRecentWeeks(), $(event.target));
+    },
+    "click .allGameSelector": function(event) {
+        selectGames(SB.Game.query.function.all(), $(event.target));
     }
 });
 
+selectGames = function selectGames(queryParms, element) {
+    // remove selected from all selector elements
+    $(".todaysGameSelector").removeClass("selectedGameControl");
+    $(".thisWeeksGameSelector").removeClass("selectedGameControl");
+    $(".allGameSelector").removeClass("selectedGameControl");
+
+console.log(element);
+    element.addClass("selectedGameControl");
+    Session.set('boardPageGameQuery', queryParms);    
+};
+
+
+
 Template.gameList.helpers({
     games : function() {
-        var games = SB.Game.getGames(SB.Game.query.function.mostRecentWeeks(), {finished: 1});
+        var games = SB.Game.getGames(Session.get('boardPageGameQuery'), {finished: 1});
         return games;
     }
 });
@@ -555,4 +570,14 @@ Template.registerHelper('sbSquaresBoarInEditMode',
         return Session.get('boardPageEditMode') 
     }
 );
+
+
+// iniitalization 
+
+Session.set('boardPageselectedSquares', []);
+Session.set('boardPageselectedGames', []);
+Session.set('boardPageselectedMembers', []);
+Session.set('boardPageEditMode', false);
+Session.set('boardPageMemberListSort', {prop: 'username', order: 1});
+selectGames(SB.Game.query.function.all(), $(".allGameSelector"));
 

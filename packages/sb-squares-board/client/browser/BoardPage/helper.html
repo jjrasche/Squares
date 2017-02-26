@@ -12,11 +12,19 @@
 
 
 <template name="gameList">
+	{{> gameSelectorControls}}
 	<ul class="list-group scrollable sameHeightCol">
 	{{#each games}}
 		{{> gameItem}}
 	{{/each}}
 	</ul>
+</template>
+<template name="gameSelectorControls">
+	<div class="row">
+		<div class="col-xs-4 todaysGameSelector">today</div>
+		<div class="col-xs-4 thisWeeksGameSelector">week</div>
+		<div class="col-xs-4 allGameSelector selectedGameControl">all</div>
+	</div>
 </template>
 <template name="gameItem">
 	<li class="list-group-item gameItems nopadding" name="gameItem" data-id={{this._id}} style="background-color: {{backgroundColor}}">
